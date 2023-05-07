@@ -1,7 +1,7 @@
-help:
-	@echo "usage: make macos-install|debian" 
-macos-install:
-	@./bin/osctools-install.sh
-debian:
+build:
 	@./bin/build.sh
+macos-install:
+	@./bin/macos-install.sh
+macos-remove:
+	@./bin/macos-remove.sh
 
