@@ -1,0 +1,19 @@
+{
+  "name": "osctools",
+  "version": "0.0.1",
+  "description": "osctools",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Basil Stotz",
+  "license": "GPL-3.0",
+  "dependencies": {
+    "n-readlines": "^1.0.1",
+    "osc-js": "^2.3.2"
+  },
+  "bin": {
+    "oscfile": "./oscfile.js",
+    "oscroute": "./oscroute.js",
+    "oscreceive": "./oscreceive.js"
+  }
+}

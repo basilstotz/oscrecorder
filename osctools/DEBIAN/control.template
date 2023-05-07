@@ -1,0 +1,12 @@
+Source: osctools
+Section: unknown
+Priority: extra
+Maintainer: Basil Stotz <stotz@amxa.ch>
+Build-Depends: debhelper (>= 8.0.0)
+Standards-Version: 3.9.2
+Package: osctools
+Architecture: all
+Version: %%version%% 
+Depends: nodejs,npm,liblo-tools
+Description: osctools
+ osctools
