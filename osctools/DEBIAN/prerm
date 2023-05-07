@@ -1,5 +1,5 @@
 #!/bin/sh
-x1# prerm script for blitzrechnen
+# prerm script for blitzrechnen
 #
 # see: dh_installdeb(1)
 

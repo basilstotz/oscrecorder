@@ -1,8 +1,6 @@
 help:
-	@echo "usage: make osctools-update|osctools-install|debian" 
-osctools-update:
-	@./bin/osctools-update.sh
-install:
+	@echo "usage: make macos-install|debian" 
+macos-install:
 	@./bin/osctools-install.sh
 debian:
 	@./bin/build.sh
