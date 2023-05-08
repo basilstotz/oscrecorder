@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 
-
 //https://github.com/adzialocha/osc-js                                                                                                      
 const OSC = require('osc-js');
 const osc = new OSC({ plugin: new OSC.DatagramPlugin() });
@@ -35,15 +34,9 @@ options: --help,-h                : show this message
          information, to stdout.`);
 }
 
-
-const lineByLine = require('n-readlines');
-
-//const config=JSON.parse(read('replay-conf.json'));
-//const file=config.file;
-//const hosts=config.hosts;
-//const port=config.port;
-
+let file='';
 let speed=1.0;
+
 const Args = process.argv.slice(2);
 if(Args[0]){
     for(let i=0;i<Args.length;i++){
@@ -67,7 +60,7 @@ if(Args[0]){
     process.exit();
 }
 
-
+const lineByLine = require('n-readlines');
 const liner = new lineByLine(file);
 let line;
 
@@ -76,11 +69,6 @@ let bundle={ time: -1 };
 
 /*
 {"time":39,"message":{"offset":24,"address":"/beamer/4/video","types":",i","args":[32]}}
-{"time":41,"message":{"offset":24,"address":"/beamer/3/video","types":",i","args":[13]}}
-{"time":2424,"message":{"offset":24,"address":"/beamer/1/video","types":",i","args":[41]}}
-{"time":1575,"message":{"offset":24,"address":"/beamer/4/video","types":",i","args":[32]}}
-{"time":1050,"message":{"offset":24,"address":"/beamer/1/video","types":",i","args":[43]}}
-{"time":1750,"message":{"offset":24,"address":"/beamer/2/video","types":",i","args":[21]}}
 */
 
 
@@ -90,7 +78,7 @@ function play(){
     }
     if(line = liner.next()){
         bundle=JSON.parse(line.toString('ascii'));
-	setTimeout(play,Math.round(speed*(bundle.time+0.5)));
+	setTimeout(play,Math.round( speed*bundle.time + 0.5 ));
     }
 }
 
