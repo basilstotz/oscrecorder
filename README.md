@@ -1,5 +1,14 @@
 # OSCtools
 
+## Objective
+
+When one would like to record sceenes working with Open Sound Control there are two main issues:
+- The OSC messages do not contain information of the used network parameters, such as the used ip address 
+and port number.
+- When using more than one OSC client (udp-sender), there is no way to synchronize the messages.
+
+
+
 ## Usage
 
 ### oscreceive
@@ -36,7 +45,7 @@ usage: orcroute /route1@path1 host1:port1 [[ /route2@path2 host2:port2 ] ... ]
        THe /route part or the @path part can bei empty. Use a single "/" for a catch all route.
 ```
 
-## Objective
+
 
 
 
