@@ -24,10 +24,22 @@ function shell(command){
 }
 // utility functions
 
-function end(){
-    console.log("usage: oscroute /pfad port [/pfad2 port2]...[/pfadn portn]  ip1 [ip2 ... ipn]");
-    process.exit();
+function help(){
+    console.log(`usage: orcroute [options] /route1@path1 host1:port1 [[ /route2@path2 host2:port2 ] ... ]
+
+options: --help,-h    : displays this help message
+         --verbose,-v : prints diagnostics
+
+       Reads osc-messages form stdin and sends the messages matching /route/path, 
+       discarding the /route part, to host:port.
+       
+       The options are always saved in ~/.oscroute.json and are applied, when oscroute
+       is called without options. It is possible to directly edit ~/.oscroute.json .
+
+       THe /route part or the @path part can bei empty. Use a single / for a catch all 
+       route.`);
 }
+
 
 //const lineByLine = require('n-readlines');
 
@@ -35,40 +47,51 @@ let table=[];
 
 const Args = process.argv.slice(2);
 
-const path=process.env.HOME+'/.oscroute.rc';
+const path=process.env.HOME+'/.oscroute.json';
 //console.log(path);
 
+let verbose=false;
 
-if(Args[1]){
-    for(i=0;i<Args.length;i++){
-//	if(Args[i].startsWith('/')){
+for(i=0;i<Args.length;i++){
+    switch(Args[i]){
+      case '-h':
+      case '--help':
+ 	 help();
+	 process.exit();
+	 brake;
+      case '-v':
+      case '--verbose':
+	 verbose=true;
+	 break;
+      default:
+	 let route=Args[i].split('@');
 
-	    let route=Args[i].split('@');
-	    
-//            if(!route[0]){route[0]='';}
-	    if((route[0]!='/')&&(route[0].endsWith('/')))route[0]=route[0].substr(0,route[0].length-1);
+	 if((route[0]!='/')&&(route[0].endsWith('/')))route[0]=route[0].substr(0,route[0].length-1);
+	 if(!route[1]){route[1]='';}else{route[1]='/'+route[1];}
 
-	    if(!route[1]){route[1]='';}else{route[1]='/'+route[1];}
+	 i++;
+	 let dest=Args[i].split(":");
+	 let host=dest[0];
+	 let port=dest[1]
 
-	    i++;
-	    let dest=Args[i].split(":");
-	    let host=dest[0];
-	    let port=dest[1]
-
-	    table.push( { route: route[0], path: route[1], host: host, port: port  } )
-//	}
+	 table.push( { route: route[0], path: route[1], host: host, port: port  } )
+	break;
     }
+}
+
+if(table[0]){
     write(path,JSON.stringify(table,null,2));    
 }else{
     if(fs.existsSync(path)){
 	table=JSON.parse(read(path));
     }else{
+	help();
 	process.exit(1);
     }    
 }
 
 
-console.log(JSON.stringify(table,null,2));
+if(verbose)console.log(JSON.stringify(table,null,2));
 
 /*
 {"clock":1682961843314,"time":3405,"message":{"offset":32,"address":"/beamer/2/video","types":",is","args":[25,"sdfsdaf"]}}
@@ -99,7 +122,7 @@ function route(table,message){
 	    let response = new OSC.Message(message.address.substring(item.route.length));
             message.args.forEach((arg)=>{response.add(arg)});
 	    osc.send(response,{ host: item.host, port: item.port })
-	    console.log(JSON.stringify(response)+" --> "+item.host+":"+item.port);	
+	    if(verbose)console.log(JSON.stringify(response)+" --> "+item.host+":"+item.port);	
 	    return true;
 	}
 	return false;
