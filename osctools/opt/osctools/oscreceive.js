@@ -2,32 +2,61 @@
 
 //https://github.com/adzialocha/osc-js
 
+
 let port;
 let name="";
-
-let last=-1;
-
 const Args = process.argv.slice(2);
 if(Args[0]){
-    port=Args[0];
+    for(let i=0;i<Args.length;i++){
+        switch(Args[i]){
+        case '-h':
+        case '--help':
+            help();
+            process.exit();
+            break;
+        default:
+            if(!port){
+		port=Args[i];
+	    }else{
+		name=Args[i];
+	    }
+            break;
+        }
+    }
 }else{
-    console.log("usage: oscreceive port [filename]");
+    help();
     process.exit();
 }
-if(Args[1]){
-    name=Args[1];
-}
+
+
     
 const fs = require('fs');
 function write(name,data){
     fs.writeFileSync(name,data,{encoding:'utf8', flag:'a'});
 }
 
+function help(){
+    console.log(`
+usage:   oscreceive [options] port [filename]
+
+options: --help,-h : show this message
+
+         Listen at <port> for osc-messages and dump them to stdout.
+
+         When <filename> is given the messages, augmented with ablolute 
+         and relative time information, are appended to <filename>.
+       
+         This file can be replayed with the same timing witch oscfile.`);
+}
+
+
 //########################################################
 
 const OSC = require('osc-js');
 const options = { open: { host: '0.0.0.0', port: port }};
 const osc = new OSC({ plugin: new OSC.DatagramPlugin(options) });
+
+let last=-1;
 
 osc.open();
 

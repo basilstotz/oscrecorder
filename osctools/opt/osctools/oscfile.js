@@ -24,6 +24,17 @@ function shell(command){
 }
 // utility functions
 
+function help(){
+    console.log(`
+usage:   oscfile [options] filename
+       
+options: --help,-h                : show this message
+         --speed,-s <speed>       : replay speed (default: 1.0)
+
+         Read osc-messages from <filename> and dump them, using the relative time 
+         information, to stdout.`);
+}
+
 
 const lineByLine = require('n-readlines');
 
@@ -32,11 +43,27 @@ const lineByLine = require('n-readlines');
 //const hosts=config.hosts;
 //const port=config.port;
 
+let speed=1.0;
 const Args = process.argv.slice(2);
 if(Args[0]){
-    file=Args[0];
+    for(let i=0;i<Args.length;i++){
+	switch(Args[i]){
+	case '--speed':
+	case '-s':
+	    speed=1.0/Args[++i];
+	    break;
+	case '-h':
+	case '--help':
+	    help();
+	    process.exit();
+	    break;
+	default:
+	    file=Args[i];
+	    break;
+	}
+    }
 }else{
-    console.log("usage: oscreplay filename");
+    help();
     process.exit();
 }
 
@@ -58,16 +85,12 @@ let bundle={ time: -1 };
 
 
 function play(){
-
     if(bundle.time>=0){
 	process.stdout.write(JSON.stringify(bundle.message)+'\n');
     }
-    
     if(line = liner.next()){
         bundle=JSON.parse(line.toString('ascii'));
-	setTimeout(play,bundle.time);
-    }else{
-	//console.log('end of file reached');
+	setTimeout(play,Math.round(speed*(bundle.time+0.5)));
     }
 }
 

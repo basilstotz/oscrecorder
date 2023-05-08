@@ -25,7 +25,8 @@ function shell(command){
 // utility functions
 
 function help(){
-    console.log(`usage: orcroute [options] /route1@path1 host1:port1 [[ /route2@path2 host2:port2 ] ... ]
+    console.log(`
+usage: orcroute [options] /route1@path1 host1:port1 [[ /route2@path2 host2:port2 ] ... ]
 
 options: --help,-h    : displays this help message
          --verbose,-v : prints diagnostics
