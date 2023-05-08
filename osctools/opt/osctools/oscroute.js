@@ -34,7 +34,7 @@ options: --help,-h    : displays this help message
        discarding the /route part, to host:port.
        
        The options are always saved in ~/.oscroute.json and are applied, when oscroute
-       is called without options. It is possible to directly edit ~/.oscroute.json .
+       is called without arguments. It is possible to directly edit ~/.oscroute.json .
 
        THe /route part or the @path part can bei empty. Use a single / for a catch all 
        route.`);
