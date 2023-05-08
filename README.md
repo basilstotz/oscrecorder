@@ -11,19 +11,19 @@ and port number.
 
 ## Usage
 
-### oscreceive
+### oscrecord
 
 ```
-usage: oscreveive port [filename]
+usage: oscrecord port [filename]
 
        Listen at <port> for osc-messages and dump them to stdout.
        When <filename> is given the messages, augmented with ablolute 
        and relative time information, are appended to <filename>.
        
-       Thesaved file can be replayed with the same timing witch oscfile.
+       The saved file can be replayed with the same timing witch oscplay.
 ```
 
-### oscfile
+### oscplay
 ```
 usage: oscfile filename
        
