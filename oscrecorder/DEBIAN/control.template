@@ -1,12 +1,12 @@
-Source: osctools
+Source: oscrecorder
 Section: unknown
 Priority: extra
 Maintainer: Basil Stotz <stotz@amxa.ch>
 Build-Depends: debhelper (>= 8.0.0)
 Standards-Version: 3.9.2
-Package: osctools
+Package: oscrecorder
 Architecture: all
 Version: %%version%% 
 Depends: nodejs,npm,liblo-tools
-Description: osctools
- osctools
+Description: a set of tools to record and playback osc messages
+ a set of tools to record and playback osc messages

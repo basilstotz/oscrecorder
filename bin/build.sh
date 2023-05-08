@@ -1,7 +1,7 @@
 #!/bin/sh
 
-find . -name "osctools_*_all.deb" -exec rm \{\} \;
-sed  osctools/DEBIAN/control.template -e "s/%%version%%/$(date +%s)/" > osctools/DEBIAN/control
-dpkg-deb -b osctools .
-rm osctools/DEBIAN/control
+find . -name "oscrecorder_*_all.deb" -exec rm \{\} \;
+sed  oscrecorder/DEBIAN/control.template -e "s/%%version%%/$(date +%s)/" > oscrecorder/DEBIAN/control
+dpkg-deb -b oscrecorder .
+rm oscrecorder/DEBIAN/control
 
