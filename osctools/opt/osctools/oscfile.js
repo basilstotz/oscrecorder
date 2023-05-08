@@ -38,26 +38,32 @@ let file='';
 let speed=1.0;
 
 const Args = process.argv.slice(2);
-if(Args[0]){
-    for(let i=0;i<Args.length;i++){
-	switch(Args[i]){
-	case '--speed':
-	case '-s':
-	    speed=1.0/Args[++i];
-	    break;
-	case '-h':
-	case '--help':
-	    help();
-	    process.exit();
-	    break;
-	default:
-	    file=Args[i];
-	    break;
-	}
-    }
-}else{
+for(let i=0;i<Args.length;i++){
+     switch(Args[i]){
+     case '--speed':
+     case '-s':
+	 speed=1.0/Args[++i];
+	 break;
+     case '-h':
+     case '--help':
+	 help();
+	 process.exit();
+	 break;
+     default:
+	 file=Args[i];
+	 break;
+     }
+}
+
+
+if(file.length==0){
     help();
     process.exit();
+}else{
+    if(!fs.fileExistsSync(file)){
+	console.log("error: could not find "+file);
+	process.exit(1);
+    }
 }
 
 const lineByLine = require('n-readlines');
