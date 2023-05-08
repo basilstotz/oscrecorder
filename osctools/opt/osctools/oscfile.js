@@ -60,7 +60,7 @@ if(file.length==0){
     help();
     process.exit();
 }else{
-    if(!fs.fileExistsSync(file)){
+    if(!fs.existsSync(file)){
 	console.log("error: could not find "+file);
 	process.exit(1);
     }
