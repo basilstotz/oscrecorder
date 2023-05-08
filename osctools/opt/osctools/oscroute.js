@@ -30,35 +30,28 @@ function help(){
 options: --help,-h    : displays this help message
          --verbose,-v : prints diagnostics
 
-       Reads osc-messages form stdin and sends the messages matching /route/path, 
-       discarding the /route part, to host:port.
+         Reads osc-messages form stdin and sends the messages matching /route/path, 
+         discarding the /route part, to host:port.
        
-       The options are always saved in ~/.oscroute.json and are applied, when oscroute
-       is called without arguments. It is possible to directly edit ~/.oscroute.json .
+         The options are always saved in ~/.oscroute.json and are applied, when oscroute
+         is called without arguments. It is possible to directly edit ~/.oscroute.json .
 
-       THe /route part or the @path part can bei empty. Use a single / for a catch all 
-       route.`);
+         The /route part or the @path part can be empty. Use a single / for a catch all 
+         route.`);
 }
 
-
-//const lineByLine = require('n-readlines');
-
 let table=[];
-
-const Args = process.argv.slice(2);
-
 const path=process.env.HOME+'/.oscroute.json';
-//console.log(path);
-
 let verbose=false;
 
+const Args = process.argv.slice(2);
 for(i=0;i<Args.length;i++){
     switch(Args[i]){
       case '-h':
       case '--help':
  	 help();
 	 process.exit();
-	 brake;
+	 break;
       case '-v':
       case '--verbose':
 	 verbose=true;
@@ -89,23 +82,14 @@ if(table[0]){
 	process.exit(1);
     }    
 }
-
-
 if(verbose)console.log(JSON.stringify(table,null,2));
 
-/*
-{"clock":1682961843314,"time":3405,"message":{"offset":32,"address":"/beamer/2/video","types":",is","args":[25,"sdfsdaf"]}}
-
-*/
-
 const readline = require('readline');
-
 const rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout,
   terminal: false
 })
-
 
 rl.on('line', (line) => {
     route(table,JSON.parse(line));
@@ -114,7 +98,6 @@ rl.on('line', (line) => {
 rl.once('close', () => {
     process.exit();
  });
-
 
 function route(table,message){ 
     table.find((item) => { 
