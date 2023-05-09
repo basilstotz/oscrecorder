@@ -1,7 +1,7 @@
 {
-  "name": "osctools",
-  "version": "0.0.1",
-  "description": "osctools",
+  "name": "oscrecorder",
+  "version": "0.0.2",
+  "description": "oscrecorder",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -12,8 +12,8 @@
     "osc-js": "^2.3.2"
   },
   "bin": {
-    "oscfile": "./oscfile.js",
+    "oscplay": "./oscplay.js",
     "oscroute": "./oscroute.js",
-    "oscreceive": "./oscreceive.js"
+    "oscrecord": "./oscrecord.js"
   }
 }
