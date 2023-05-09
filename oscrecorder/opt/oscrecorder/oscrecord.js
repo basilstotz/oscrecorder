@@ -37,7 +37,7 @@ function write(name,data){
 
 function help(){
     console.log(`
-usage:   oscreceive [options] port [filename]
+usage:   oscrecord [options] port [filename]
 
 options: --help,-h : show this message
 

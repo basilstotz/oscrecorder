@@ -25,7 +25,7 @@ function shell(command){
 
 function help(){
     console.log(`
-usage:   oscfile [options] filename
+usage:   oscplay [options] filename
        
 options: --help,-h                : show this message
          --speed,-s <speed>       : replay speed (default: 1.0)

@@ -14,35 +14,45 @@ and port number.
 ### oscrecord
 
 ```
-usage: oscrecord port [filename]
+usage:   oscrecord [options] port [filename]
 
-       Listen at <port> for osc-messages and dump them to stdout.
-       When <filename> is given the messages, augmented with ablolute 
-       and relative time information, are appended to <filename>.
+options: --help,-h : show this message
+
+         Listen at <port> for osc messages and write them to stdout.
+
+         When <filename> is given the messages, augmented with ablolute 
+         and relative time information, are appended to <filename>.
        
-       The saved file can be replayed with the same timing witch oscplay.
+         This file can be replayed with the same timing using oscfile.
 ```
 
 ### oscplay
 ```
-usage: oscfile filename
+usage:   oscfile [options] filename
        
-       Read osc-messages from <filename> and dump them, using the relative time 
-       information, to stdout.
+options: --help,-h                : show this message
+         --speed,-s <speed>       : replay speed (default: 1.0)
+
+         Read osc messages from <filename> and write them, using the same timing
+	 when recorded, to stdout.
 ```
 
 ### oscroute
 
 ```
-usage: orcroute /route1@path1 host1:port1 [[ /route2@path2 host2:port2 ] ... ]
+usage: orcroute [options] /route1[@path1] host1:port1 [[ /route2[@path2] host2:port2 ] ... ]
 
-       Reads osc-messages form stdin and sends the messages matching /route/path, 
-       discarding the /route part, to host:port.
+options: --help,-h    : displays this help message
+         --verbose,-v : prints diagnostics
+
+         Reads osc messages form stdin and sends the messages matching /route/path, 
+         discarding the /route part, to host:port.
        
-       The options are always saved in ~/.oscroute.rc and are applied, when oscroute
-       is called without options. It is possible to directly edit ~/.oscroute.rc .
+         The options are always saved in ~/.oscroute.json and are applied, when oscroute
+         is called without arguments. It is possible to directly edit ~/.oscroute.json .
 
-       THe /route part or the @path part can bei empty. Use a single "/" for a catch all route.
+         The /route part or the @path part can be empty. Use a single / for a catch all 
+         route.
 ```
 
 
