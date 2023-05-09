@@ -1,4 +1,4 @@
-# OSCtools
+# OSCrecorder
 
 ## Objective
 
