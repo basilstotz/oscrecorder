@@ -1,2 +1,2 @@
 #!/bin/sh
-npm -g uninstall osctools || true
+npm -g uninstall oscrecorder || true
