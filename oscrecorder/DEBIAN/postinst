@@ -20,7 +20,7 @@ set -e
 
 case "$1" in
     configure)
-	cd /opt/osctools
+	cd /opt/oscrecorder
 	npm -g install
     ;;
 
