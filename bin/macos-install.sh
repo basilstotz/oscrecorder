@@ -1,5 +1,5 @@
 #!/bin/sh
-npm -g uninstall osctools || true
+npm -g uninstall oscrecorder || true
 
-cd osctools/opt/osctools/ 
+cd oscrecorder/opt/oscrecorder/ 
 npm -g install
