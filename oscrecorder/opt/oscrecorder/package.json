@@ -14,6 +14,10 @@
   "bin": {
     "oscplay": "./oscplay.js",
     "oscroute": "./oscroute.js",
-    "oscrecord": "./oscrecord.js"
+      "oscrecord": "./oscrecord.js",
+    "oscplay2": "./oscplay2.js",
+    "oscroute2": "./oscroute2.js",
+      "oscrecord2": "./oscrecord2.js",
+      "oscaddroute2": "./oscaddroute2.js"
   }
 }
