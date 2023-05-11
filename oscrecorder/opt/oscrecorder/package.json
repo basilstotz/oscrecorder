@@ -13,8 +13,8 @@
   },
   "bin": {
     "oscplay": "./oscplay2.js",
-    "oscemit": "./oscroute2.js",
+    "oscemit": "./oscemit2.js",
     "oscrecord": "./oscrecord2.js",
-    "oscreceive": "./oscaddroute2.js"
+    "oscreceive": "./oscreceive2.js"
   }
 }
