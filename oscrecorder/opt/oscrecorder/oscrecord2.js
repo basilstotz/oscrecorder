@@ -14,16 +14,16 @@ function append(name,data){
 
 function help(){
     console.log(`
-usage:   oscrecord [options] port [filename]
+  usage: oscrecord2 [options] port [filename]
 
 options: --help,-h : show this message
 
-         Listen at <port> for osc-messages and dump them to stdout.
+         Reads osc messages on stdin and copy them to stdout.
 
-         When <filename> is given the messages appended to <filename>.
-         as an OSC-bundle, using the current time as timetag.
+         The messages are appended to <filename>.
+         as an OSC bundle, using the current time as timetag.
 
-         This file can be replayed with the same timing with oscplay.`);
+         This file can be replayed with the same timing with oscplay2.`);
 }
 
 

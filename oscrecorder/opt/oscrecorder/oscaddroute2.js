@@ -25,19 +25,19 @@ function shell(command){
 
 function help(){
     console.log(`
-usage: orcroute [options] /route1@path1 host1:port1 [[ /route2@path2 host2:port2 ] ... ]
+usage: oscaddroute [options] /route1:port1 [[ /route2:port2 ] ... ]
 
 options: --help,-h    : displays this help message
          --verbose,-v : prints diagnostics
 
-         Reads osc-messages form stdin and sends the messages matching /route/path, 
-         discarding the /route part, to host:port.
+         Listen for osc messages on all given ports, adds the proper /route to the 
+         address of the message and writes the message to stdout.
        
-         The options are always saved in ~/.oscroute.json and are applied, when oscroute
-         is called without arguments. It is possible to directly edit ~/.oscroute.json .
+         The options are always saved in ~/.oscaddroute.json and are applied, when 
+         oscaddroute is called without arguments. It is possible to directly 
+         edit ~/.oscaddroute.json .
 
-         The /route part or the @path part can be empty. Use a single / for a catch all 
-         route.`);
+         The /route can be empty. Use  :port , when no route sould be added.`);
 }
 
 let table=[];
