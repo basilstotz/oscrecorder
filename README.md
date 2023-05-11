@@ -14,16 +14,16 @@ and port number.
 ### oscrecord
 
 ```
-usage:   oscrecord [options] port [filename]
+  usage: oscrecord2 [options] port [filename]
 
 options: --help,-h : show this message
 
-         Listen at <port> for osc messages and write them to stdout.
+         Reads osc messages on stdin and copy them to stdout.
 
-         When <filename> is given the messages, augmented with ablolute 
-         and relative time information, are appended to <filename>.
-       
-         This file can be replayed with the same timing using oscfile.
+         The messages are additionaly appended to <filename>.
+         as an OSC bundle, using the current time as timetag.
+
+         This file can be replayed with the same timing with oscplay.
 ```
 
 ### oscplay
@@ -37,10 +37,10 @@ options: --help,-h                : show this message
 	 when recorded, to stdout.
 ```
 
-### oscroute
+### oscemit
 
 ```
-usage: orcroute [options] /route1[@path1] host1:port1 [[ /route2[@path2] host2:port2 ] ... ]
+usage: orcemit [options] /route1[@path1] host1:port1 [[ /route2[@path2] host2:port2 ] ... ]
 
 options: --help,-h    : displays this help message
          --verbose,-v : prints diagnostics
@@ -55,7 +55,21 @@ options: --help,-h    : displays this help message
          route.
 ```
 
+### oscreceive
 
+```
+options: --help,-h    : displays this help message
+         --verbose,-v : prints diagnostics
+
+         Listen for osc messages on all given ports, adds the proper /route to the 
+         address of the message and writes the message to stdout.
+       
+         The options are always saved in ~/.oscaddroute.json and are applied, when 
+         oscaddroute is called without arguments. It is possible to directly 
+         edit ~/.oscaddroute.json .
+
+         The /route can be empty: Use  :port , when no route sould be added.
+```
 
 
 
