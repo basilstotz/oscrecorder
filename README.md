@@ -58,6 +58,8 @@ options: --help,-h    : displays this help message
 ### oscreceive
 
 ```
+usage: oscaddroute [options] /route1:port1 [[ /route2:port2 ] ... ]
+
 options: --help,-h    : displays this help message
          --verbose,-v : prints diagnostics
 
