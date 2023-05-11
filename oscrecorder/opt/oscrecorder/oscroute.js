@@ -112,3 +112,15 @@ function route(table,message){
 	return false;
     });
 }
+
+function decode(table,input){
+    if(input.timeTag){
+	//it's a bundle
+        input.xxxxx.forEach( (message) => {
+	    if(!message.timeTag)route(table,message);
+	});
+    }else{
+	//it's a message
+	route(table,input);
+    }
+}
