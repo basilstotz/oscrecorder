@@ -43,7 +43,6 @@ options: --help,-h    : displays this help message
 let table=[];
 let verbose=false;
 
-
 const Args = process.argv.slice(2);
 for(i=0;i<Args.length;i++){
     switch(Args[i]){
@@ -80,7 +79,8 @@ if(verbose)console.log(JSON.stringify(table,null,2));
 
 function addroute(message,route){
     let response= new OSC.Message(route+message.address);
-    message.args.forEach( (arg) => { response.add(arg); })
+    message.args.forEach( (arg) => { response.add(arg); });
+    delete response.offset;
     process.stdout.write(JSON.stringify(response)+'\n');
 }
 

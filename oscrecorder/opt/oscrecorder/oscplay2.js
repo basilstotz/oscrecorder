@@ -90,7 +90,7 @@ function getTime(bundle){
     /** 2^32 */
     const TWO_POWER_32 = 4294967296;
     
-    let timetag=bundle.timetag.value;
+    let timetag=bundle.timetag;
     let seconds = timetag.seconds - SECONDS_70_YEARS;
     return (seconds + Math.round(timetag.fractions / TWO_POWER_32)) * 1000;
 }
@@ -109,7 +109,8 @@ function play(){
         bundle=JSON.parse(line.toString('ascii'));
 
 	let bundleTime=getTime(bundle);
-
+        //let bundleTime=bundle.timestamp();
+	
 	if(!firstTime){
 	    firstTime=bundleTime;
 	    startTime= new Date().getTime();

@@ -56,7 +56,11 @@ function record(message){
     if(name){
 	let response = new OSC.Message(message.address);
 	message.args.forEach( (arg) => { response.add(arg) });
-	append(name,JSON.stringify(new OSC.Bundle(response))+'\n');
+	let bundle=new OSC.Bundle(response);
+	delete bundle.offset;
+	bundle.timetag=bundle.timetag.value;
+	bundle.bundleElements.forEach( (item) => { delete item.offset });
+	append(name,JSON.stringify(bundle)+'\n');
     }
 };
 
