@@ -15,6 +15,6 @@
     "oscplay": "./oscplay2.js",
     "oscemit": "./oscemit2.js",
     "oscrecord": "./oscrecord2.js",
-    "oscreceive": "./oscreceive2.js"
+    "osclisten": "./osclisten2.js"
   }
 }

@@ -1,11 +1,18 @@
 #!/usr/bin/env node
 
 
-//https://github.com/adzialocha/osc-js                                                                                                      
+//https://github.com/adzialocha/osc-js
+
+const dgram = require('dgram');
+
+
 const OSC = require('osc-js');
+
 
 const fs = require('fs');
 const { execSync } = require('child_process');
+
+const common = require('./common.js');
 
 // utilty functions
 function read(name){
@@ -21,11 +28,13 @@ function shell(command){
     let opts= { encoding: 'utf8' };
     return execSync(command,[], opts);
 }
+
+
 // utility functions
 
 function help(){
     console.log(`
-usage: oscaddroute [options] /route1:port1 [[ /route2:port2 ] ... ]
+usage: osclisten [options] port1[:/route1] [[ port2[:/route2] ] ... ]
 
 options: --help,-h    : displays this help message
          --verbose,-v : prints diagnostics
@@ -33,19 +42,21 @@ options: --help,-h    : displays this help message
          Listen for osc messages on all given ports, adds the proper /route to the 
          address of the message and writes the message to stdout.
        
-         The options are always saved in ~/.oscaddroute.json and are applied, when 
+         The options are always saved in ~/.osclisten.json and are applied, when 
          oscaddroute is called without arguments. It is possible to directly 
-         edit ~/.oscaddroute.json .
-
-         The /route can be empty. Use  :port , when no route sould be added.`);
+         edit ~/.osclisten.json .`);
 }
 
 let table=[];
 let verbose=false;
 
+let port;
+let route;
+
 const Args = process.argv.slice(2);
 for(i=0;i<Args.length;i++){
-    switch(Args[i]){
+    let arg=Args[i];
+    switch(arg){
       case '-h':
       case '--help':
  	help();
@@ -55,16 +66,24 @@ for(i=0;i<Args.length;i++){
       case '--verbose':
 	verbose=true;
 	break;
-      default:
-	let item=Args[i].split(':');
-	let port=item[1];
-	let route=item[0];
+    default:
+	//console.log(arg.indexOf(':'));
+	if(arg.indexOf(':')!=-1){
+	    let item=arg.split(':');
+	    port=item[0];
+	    route=item[1];
+
+	}else{
+	    port=arg;
+	    route='';
+	}
+	if(route.endsWith('/')){route=route.substring(0,route.length-1)};
 	table.push( {  port: port , route: route } );
 	break;
     }    
 }
 
-const path=process.env.HOME+'/.oscaddroute.json';
+const path=process.env.HOME+'/.osclisten.json';
 if(table[0]){
     write(path,JSON.stringify(table,null,2));    
 }else{
@@ -77,19 +96,34 @@ if(table[0]){
 }
 if(verbose)console.log(JSON.stringify(table,null,2));
 
-function addroute(message,route){
-    let response= new OSC.Message(route+message.address);
-    message.args.forEach( (arg) => { response.add(arg); });
-    delete response.offset;
-    process.stdout.write(JSON.stringify(response)+'\n');
-}
 
+/* table example
+
+[
+  { "port": "8008", "route": "/ardour" },
+  { "port": "8009", "route": "/jadeo" }
+]
+
+*/
+    
 table.forEach( (item) => {
     item.osc = new OSC({ plugin: new OSC.DatagramPlugin() });
-    item.osc.open( { host: '0.0.0.0', port: item.port });
     item.osc.on('open', () => {
 	item.osc.on('*', (message) => {
-	    addroute(message,item.route);
+	    // make bundle
+	    let bundle = new OSC.Bundle();
+	    bundle.add(message);
+	    // add route
+	    bundle.bundleElements[0].address = item.route + bundle.bundleElements[0].address;
+	    // beautify
+	    delete bundle.bundleElements[0].offset;
+	    delete bundle.offset;
+	    bundle.timetag=bundle.timetag.value;
+	    // write
+	    process.stdout.write(JSON.stringify(bundle)+'\n');
 	})
     })
+    item.osc.open( { host: '0.0.0.0', port: item.port });
 });
+
+  

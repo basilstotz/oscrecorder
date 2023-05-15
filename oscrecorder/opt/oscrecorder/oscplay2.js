@@ -56,7 +56,12 @@ for(let i=0;i<Args.length;i++){
 	 process.exit();
 	 break;
      default:
-	 file=Args[i];
+ 	 if(!file){
+	    file=Args[i];
+	 }else{
+	    help();
+	    process.exit(1);
+	 }
 	 break;
      }
 }
@@ -85,11 +90,11 @@ let startTime;
 */
 
 function getTime(bundle){
-    /** 70 years in seconds */
     const SECONDS_70_YEARS = 2208988800;
-    /** 2^32 */
     const TWO_POWER_32 = 4294967296;
     
+    if(bundle.timetag.value)bundle.timetag=bundle.timetag.value;
+
     let timetag=bundle.timetag;
     let seconds = timetag.seconds - SECONDS_70_YEARS;
     return (seconds + Math.round(timetag.fractions / TWO_POWER_32)) * 1000;
