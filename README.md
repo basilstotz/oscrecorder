@@ -1,7 +1,6 @@
 # OSCrecorder
 
 ## Objective
-
 When one would like to record sceenes working with Open Sound Control there are two main issues:
 - The OSC messages do not contain information of the used network parameters, such as the used ip address 
 and port number.
@@ -12,9 +11,8 @@ and port number.
 ## Usage
 
 ### oscrecord
-
 ```
-  usage: oscrecord2 [options] port [filename]
+  usage: oscrecord [options] filename
 
 options: --help,-h : show this message
 
@@ -28,7 +26,7 @@ options: --help,-h : show this message
 
 ### oscplay
 ```
-usage:   oscfile [options] filename
+  usage: oscplay [options] filename
        
 options: --help,-h                : show this message
          --speed,-s <speed>       : replay speed (default: 1.0)
@@ -38,9 +36,8 @@ options: --help,-h                : show this message
 ```
 
 ### oscemit
-
 ```
-usage: orcemit [options] /route1[@path1] host1:port1 [[ /route2[@path2] host2:port2 ] ... ]
+  usage: orcemit [options] /route1[@path1] host1:port1 [[ /route2[@path2] host2:port2 ] ... ]
 
 options: --help,-h    : displays this help message
          --verbose,-v : prints diagnostics
@@ -56,9 +53,8 @@ options: --help,-h    : displays this help message
 ```
 
 ### oscreceive
-
 ```
-usage: oscaddroute [options] /route1:port1 [[ /route2:port2 ] ... ]
+  usage: oscreceive [options] /route1:port1 [[ /route2:port2 ] ... ]
 
 options: --help,-h    : displays this help message
          --verbose,-v : prints diagnostics
@@ -72,6 +68,3 @@ options: --help,-h    : displays this help message
 
          The /route can be empty: Use  :port , when no route sould be added.
 ```
-
-
-
