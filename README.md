@@ -16,11 +16,9 @@ and port number.
 
 options: --help,-h : show this message
 
-         Reads osc messages on stdin and copy them to stdout.
-
-         The messages are additionaly appended to <filename>.
-         as an OSC bundle, using the current time as timetag.
-
+         Reads osc messages on stdin and writes them unaltered to stdout
+         and to <filename>.
+	 
          This file can be replayed with the same timing with oscplay.
 ```
 
@@ -37,10 +35,11 @@ options: --help,-h                : show this message
 
 ### oscemit
 ```
-  usage: orcemit [options] /route1[@path1] host1:port1 [[ /route2[@path2] host2:port2 ] ... ]
+  usage: oscemit [options] /route1[@path1] host1:port1 [[ /route2[@path2] host2:port2 ] ... ]
 
-options: --help,-h    : displays this help message
-         --verbose,-v : prints diagnostics
+options: --help,-h                    : displays this help message
+         --verbose,-v                 : prints diagnostics
+	 --timeoffset,-t <timeoffset> : scedules messages <timeoffset> ms it the future [defalult=100]  
 
          Reads osc messages form stdin and sends the messages matching /route/path, 
          discarding the /route part, to host:port.
@@ -52,9 +51,9 @@ options: --help,-h    : displays this help message
          route.
 ```
 
-### oscreceive
+### osclisten
 ```
-  usage: oscreceive [options] /route1:port1 [[ /route2:port2 ] ... ]
+  usage: osclisten [options] port1[:/route1] [[ poert2[/route2] ] ... ]
 
 options: --help,-h    : displays this help message
          --verbose,-v : prints diagnostics
@@ -66,5 +65,34 @@ options: --help,-h    : displays this help message
          oscaddroute is called without arguments. It is possible to directly 
          edit ~/.oscaddroute.json .
 
-         The /route can be empty: Use  :port , when no route sould be added.
+         The /route can be empty: Use port , when no route sould be added.
 ```
+
+## Examples
+### Basic Usage
+
+Listen on port 8008 for OSC messages and write then to stdout:
+
+```osclisten 8008 ```
+
+Listen on port 8008 for OSC messages and record the message on file ```record.osc```:
+
+```osclisten 8008 | oscreord record.osc```
+
+The messages are also written to stdout. This can be used for inspection or it can be piped to
+```oscemit```:
+
+```osclisten 8008 | oscreord record.osc | oscemit / 192.168.1.123:9000```
+
+This will record the messages in file ```record.osc``` and additionaly send then to host
+```192.168.1.123``` on port ```9000```.
+
+To playback the recorded messages in file ```record.osc``` to host ```192.168.1.123``` 
+on port ```9000``` use:
+
+```oscplay record.osc | oscemit / 192.168.1.123:900```
+
+### Advanced Usage
+
+Listen on port ```8008```, add the route ```/ardour``` and listen on port ```800```, add the route ```/jadeo``` to the messages:
+``` ```
