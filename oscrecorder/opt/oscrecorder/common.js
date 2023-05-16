@@ -1,3 +1,5 @@
+const OSC = require('osc-js');
+//const {Timetag} = require( 'osc-js/src/atomic/timetag.js');
 
 exports.getTime = function(bundle){
     const SECONDS_70_YEARS = 2208988800;
@@ -13,6 +15,43 @@ exports.getTime = function(bundle){
     let seconds = timetag.seconds - SECONDS_70_YEARS;
     return (seconds + Math.round(timetag.fractions / TWO_POWER_32)) * 1000;
 }
+
+exports.getTime2 = function(bundle){
+    
+    let timetag;
+    if(bundle.timetag.value){
+	timetag=bundle.timetag.value;
+    }else{
+	timetag=bundle.timetag;
+    }
+
+    let t = new OSC.Timetag(timetag);
+    return t.timestamp();
+}
+
+exports.timestamp = function(timetag,milliseconds) {
+
+    const SECONDS_70_YEARS = 2208988800;
+    const TWO_POWER_32 = 4294967296.0;
+ 
+    let seconds
+ 
+    if (typeof milliseconds === 'number') {
+      seconds = milliseconds / 1000
+      const rounded = Math.floor(seconds)
+ 
+      timetag.seconds = rounded + SECONDS_70_YEARS
+      timetag.fractions = Math.round(TWO_POWER_32 * (seconds - rounded))
+ 
+      return milliseconds
+    }
+ 
+    seconds = timetag.seconds - SECONDS_70_YEARS
+    //orig: return (seconds + Math.round(timetag.fractions / TWO_POWER_32)) * 1000
+    return Math.round((seconds + timetag.fractions / TWO_POWER_32) * 1000)
+}
+
+
 
 /*
 {"address":"/uhu","types":",i","args":[43] }             

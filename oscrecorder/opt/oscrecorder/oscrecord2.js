@@ -51,20 +51,10 @@ if(Args[0]){
     process.exit();
 }
 
-function record(message){
-    process.stdout.write(JSON.stringify(message)+'\n');
-    if(name){
-	let response = new OSC.Message(message.address);
-	message.args.forEach( (arg) => { response.add(arg) });
-	let bundle=new OSC.Bundle(response);
-	
-	delete bundle.offset;
-	bundle.timetag=bundle.timetag.value;
-	bundle.bundleElements.forEach( (item) => { delete item.offset });
-
-	append(name,JSON.stringify(bundle)+'\n');
-    }
-};
+if(!name){
+    help();
+    process.exit(1);
+}
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -73,7 +63,9 @@ const rl = readline.createInterface({
 })
 
 rl.on('line', (line) => {
-    record(JSON.parse(line));
+    let message=JSON.parse(line);
+    process.stdout.write(JSON.stringify(message)+'\n');
+    append(name,JSON.stringify(bundle)+'\n');
 });
 
 rl.once('close', () => {

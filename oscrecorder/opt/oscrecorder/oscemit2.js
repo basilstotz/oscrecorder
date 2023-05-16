@@ -68,7 +68,7 @@ for(i=0;i<Args.length;i++){
 	 break;
       case '-t':
       case '--timeOffset':
-	timeOffset=Args[++i]; 
+	timeOffset=Math.round(Args[++i]); 
 	 break;
       default:
 	 let route=Args[i].split('@');
@@ -106,41 +106,84 @@ const rl = readline.createInterface({
 })
 
 rl.on('line', (line) => {
-    route(JSON.parse(line));
+    route2(JSON.parse(line));
 });
 
 rl.once('close', () => {
     process.exit();
  });
 
-
+//console.log(timeOffset);
 
 /*
 {"offset":0,"timetag":{"value":{"seconds":3892649641,"fractions":38654976},"offset":0},"bundleElements":[{"offset":36\
 ,"address":"/uhu","types":",i","args":[43]}]}                                                                         
 */
+/*
+let u={};
+let d=new Date().getTime();
+let t=common.timestamp(u,d);
+console.log(t+' '+d+' '+JSON.stringify(u));
+t=common.timestamp(u);
+console.log(t);
+t=common.timestamp(u,t);
+console.log(t+' '+d+' '+JSON.stringify(u));
+*/
 
 
-	
-function route(packet,timetag){
 
+function out(table,message,timestamp){
+    table.find( (item) => {
+	if(message.address.indexOf(item.route+item.path)==0){
+	    let response = new OSC.Message(message.address.substring(item.route.length));
+	    message.args.forEach((arg)=>{response.add(arg)});
+	    let bundle = new OSC.Bundle(timestamp);
+	    //bundle.timestamp();
+	    //console.log(timestamp);
+	    //console.log(common.timestamp(bundle.timetag.value));
+	    bundle.add(response);
+	    osc.send(bundle,{ host: item.host, port: item.port });
+	    if(verbose)console.log(JSON.stringify(bundle)+" --> "+item.host+":"+item.port);
+	    return true;
+	}
+	return false;	
+    });
+}
+
+
+function route2(packet){
+    let timestamp=common.timestamp(packet.timetag)+timeOffset;
+    //console.log(timestamp);
+    //timestamp+=timeOffset;;
+    //let u={};
+    //common.timestamp(u,timestamp);
+    //console.log(JSON.stringify(u));
+    //console.log(common.timestamp(u));
+    out(table,packet.bundleElements[0],timestamp);
+}
+
+function route(packet){
+
+    let timestamp;
+    
     if(packet.timetag){
-	packet.bundleElements.forEach( (item) => { route(item,common.getTime(packet)) })
+	timestamp=Math.round(common.timestamp(packet.timetag));
+	console.log(timestamp+'*');
+	packet.bundleElements.forEach( (item) => {
+	    if(item.timestamp){
+	        route(item);
+	    }else{
+		out(table,item,timestamp);
+	    }
+	});			       
     }else{
-	if(!timetag)timetag=new Date().getTime();
-        table.find((item) => {
-	   if(packet.address.indexOf(item.route+item.path)==0){
-	       
-	       let response = new OSC.Message(packet.address.substring(item.route.length));
-	       packet.args.forEach((arg)=>{response.add(arg)});
-	       let bundle = new OSC.Bundle(timetag+timeOffset);
-	       bundle.add(response);
-	       osc.send(bundle,{ host: item.host, port: item.port })
-	       if(verbose)console.log(JSON.stringify(bundle)+" --> "+item.host+":"+item.port);	
-	       return true;
-	       
-	   }
-	   return false;
-       });	
+	timestamp = Math.round(new Date().getTime());
+	console.log(timestamp);
+	out(table,packet,timestamp);
     }
 }
+
+
+    
+
+
