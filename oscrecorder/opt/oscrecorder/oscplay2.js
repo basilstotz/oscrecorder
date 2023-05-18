@@ -1,27 +1,6 @@
 #!/usr/bin/env node
 
-//https://github.com/adzialocha/osc-js                                                                                                      
-const OSC = require('osc-js');
-const osc = new OSC({ plugin: new OSC.DatagramPlugin() });
-
-const fs = require('fs');
-const { execSync } = require('child_process');
-
-// utilty functions
-function read(name){
-    return fs.readFileSync(name,{encoding:'utf8', flag:'r'});
-}
-
-function write(name,data){
-    fs.writeFileSync(name,data,{encoding:'utf8', flag:'w'});
-}
-
-function shell(command){
-    //console.log(args);
-    let opts= { encoding: 'utf8' };
-    return execSync(command,[], opts);
-}
-// utility functions
+const lineByLine = require('n-readlines');
 
 function help(){
     console.log(`
@@ -76,10 +55,8 @@ if(file.length==0){
     }
 }
 
-const lineByLine = require('n-readlines');
 const liner = new lineByLine(file);
 let line;
-
 
 /*
 {"offset":0,"timetag":{"value":{"seconds":3892649641,"fractions":38654976},"offset":0},"bundleElements":[{"offset":36,"address":"/uhu","types":",i","args":[43]}]}
