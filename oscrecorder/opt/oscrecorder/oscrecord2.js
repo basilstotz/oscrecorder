@@ -63,9 +63,9 @@ const rl = readline.createInterface({
 })
 
 rl.on('line', (line) => {
-    let message=JSON.parse(line);
-    process.stdout.write(JSON.stringify(message)+'\n');
-    append(name,JSON.stringify(bundle)+'\n');
+    //let message=JSON.parse(line);
+    process.stdout.write(line+'\n');
+    append(name,line+'\n');
 });
 
 rl.once('close', () => {
