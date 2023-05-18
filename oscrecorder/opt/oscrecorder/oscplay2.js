@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 
 const lineByLine = require('n-readlines');
+const Utils = require('./common.js');
+
 
 function help(){
     console.log(`
@@ -49,7 +51,7 @@ if(file.length==0){
     help();
     process.exit();
 }else{
-    if(!fs.existsSync(file)){
+    if(!Utils.exists(file)){
 	console.log("error: could not find "+file);
 	process.exit(1);
     }
@@ -73,18 +75,21 @@ function getTime(bundle){
     return (seconds + Math.round(timetag.fractions / TWO_POWER_32)) * 1000;
 }
 
-let timeOffset=1000;
+let timeOffset;
 let minTime=99999999999999999999;
 let bundles=[];
 
-//console.log(new Date().getTime());
+let start=new Date().getTime();
+
 while(line = liner.next()){
     bundle=JSON.parse(line.toString('ascii'));
     let time=getTime(bundle);
     if(time<minTime)minTime=time;
     bundles.push( { time: time, bundle: bundle } );
 }
-//console.log(new Date().getTime());
+
+timeOffset=new Date().getTime()-start;
+
 bundles.forEach( (item) => {
     let elapsed=Math.round(speed*(item.time-minTime))+timeOffset;
     setTimeout( (bundle) => { process.stdout.write(JSON.stringify(bundle)+'\n')} ,elapsed,item.bundle);

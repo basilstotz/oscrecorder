@@ -1,5 +1,12 @@
 const OSC = require('osc-js');
+const fs = require('fs');
+
 //const {Timetag} = require( 'osc-js/src/atomic/timetag.js');
+
+
+exports.exists = function(name){
+    return fs.existsSync(name);
+}
 
 exports.getTime = function(bundle){
     const SECONDS_70_YEARS = 2208988800;
