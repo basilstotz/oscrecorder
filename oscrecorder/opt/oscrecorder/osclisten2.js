@@ -158,7 +158,6 @@ if(false){
 	       const msg= new OSC.Message();
 	       msg.unpack(dataView(data));
 	       bundle.add(msg);
-	       //console.log(JSON.stringify(bundle));
 	   }
 	   Utils.forEachMessage(bundle, (message, timestamp) => {
 	       out(item.route, message, timestamp)
