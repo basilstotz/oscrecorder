@@ -81,6 +81,9 @@ const lineByLine = require('n-readlines');
 const liner = new lineByLine(file);
 let line;
 
+let waitTime;
+let firstTime;
+let startTime;
 
 /*
 {"offset":0,"timetag":{"value":{"seconds":3892649641,"fractions":38654976},"offset":0},"bundleElements":[{"offset":36,"address":"/uhu","types":",i","args":[43]}]}
@@ -96,18 +99,41 @@ function getTime(bundle){
     let seconds = timetag.seconds - SECONDS_70_YEARS;
     return (seconds + Math.round(timetag.fractions / TWO_POWER_32)) * 1000;
 }
+    
 
-let timeOffset=1000;
-let minTime=99999999999999999999;
-let bundles=[];
+function play(){
+    if(waitTime){
+	bundle.bundleElements.forEach( (message) => {
+	    if(!message.timetag){
+		process.stdout.write(JSON.stringify(message)+'\n');
+	    }
+	});
+    }    
+    if(line = liner.next()){
+        bundle=JSON.parse(line.toString('ascii'));
 
-while(line = liner.next()){
-    bundle=JSON.parse(line.toString('ascii'));
-    let time=getTime(bundle);
-    if(time<minTime)minTime=time;
-    bundles.push( { time: time, bundle: bundle } );
+	let bundleTime=getTime(bundle);
+        //let bundleTime=bundle.timestamp();
+	
+	if(!firstTime){
+	    firstTime=bundleTime;
+	    startTime= new Date().getTime();
+	}
+	
+	let elapsed=Math.round(speed*(bundleTime-firstTime));
+	let sendTime=startTime+elapsed;	
+	waitTime=sendTime-new Date().getTime();
+	
+	if(maxSkip){
+	    if( (waitTime>maxSkip) || (waitTime<100) ){
+		firstTime=false;
+		waitTime=1000;
+	    }
+	}
+	if(waitTime<1)waitTime=1;
+	
+	setTimeout(play,waitTime);
+    }
 }
-bundles.forEach( (item) => {
-    let elapsed=(item.time-minTime)+timeOffset;
-    setTimeout( (bundle) => { process.stdout.write(JSON.stringify(bundle)+'\n')} ,elapsed,item.bundle);
-});
+
+play();    
