@@ -37,7 +37,7 @@ usage: orcroute [options] /route1@path1 host1:port1 [[ /route2@path2 host2:port2
 options: --help,-h                    : displays this help message
          --verbose,-v                 : prints diagnostics
          --timeoffset,-t <timeoffset> : scedules osc-bundles <timeoffset> ms it the future [defalult=100]
-         --messages,-m                : emit osc-messages in place of osc-bundles
+         --messages,-m                : emit osc-messages not osc-bundles
 
          Reads osc messages form stdin and sends the messages matching /route/path, 
          discarding the /route part, to host:port.
@@ -117,7 +117,6 @@ const rl = readline.createInterface({
 })
 
 rl.on('line', (line) => {
-    //route(JSON.parse(line));
     utils.forEachMessage(JSON.parse(line),out);
 });
 
@@ -138,19 +137,21 @@ function out(message,timestamp){
 		bundle.add(response);
 	    }
 	    osc.send(bundle,{ host: item.host, port: item.port });
-	    delete bundle.offset;
-	    if(bundle.timetag){
-		delete bundle.bundleElements[0].offset;
-	        bundle.timetag=bundle.timetag.value;
+	    if(verbose){
+		delete bundle.offset;
+		if(bundle.timetag){
+		    delete bundle.bundleElements[0].offset;
+	            bundle.timetag=bundle.timetag.value;
+		}
+		console.log(JSON.stringify(bundle)+" --> "+item.host+":"+item.port);
 	    }
-	    if(verbose)console.log(JSON.stringify(bundle)+" --> "+item.host+":"+item.port);
 	    return true;
 	}
 	return false;	
     });
 }
 
-
+/*
 function route(packet){
 
     let timestamp;
@@ -175,3 +176,4 @@ function route2(packet){
     out(table,packet.bundleElements[0],timestamp);
 }
 
+*/
