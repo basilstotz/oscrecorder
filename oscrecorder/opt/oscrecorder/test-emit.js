@@ -35,18 +35,20 @@ let b1= new OSC.Bundle([m2],new Date().getTime()+1000);
 //b1.add(m2);
 
 let b2= new OSC.Bundle([m3], new Date().getTime()+5000);
-//b2.add(m3);
+b2.add(b1);
 
 let b3=new OSC.Bundle([m1,m1,m1,m1,m1]);
-//b3.add(m3);
+b3.add(b2);
 
-let options={host: "localhost", port: 8008 }
+let options={host: "localhost", port: 9000 }
 
 console.log(JSON.stringify(b1)+'\n');
 console.log(JSON.stringify(b2)+'\n');
 console.log(JSON.stringify(b3)+'\n');
 
-
+osc.send(m1,options);
 osc.send(b1,options );
 osc.send(b2, options);
 osc.send(b3, options);
+osc.send(m2,options);
+osc.send(m3,options);

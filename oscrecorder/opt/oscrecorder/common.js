@@ -29,7 +29,9 @@ exports.getTime2 = function(bundle){
     return t.timestamp();
 }
 
-exports.timestamp = function(timetag,milliseconds) {
+
+
+function timestamp(timetag,milliseconds) {
 
     const SECONDS_70_YEARS = 2208988800;
     const TWO_POWER_32 = 4294967296.0;
@@ -51,11 +53,36 @@ exports.timestamp = function(timetag,milliseconds) {
     return Math.round((seconds + timetag.fractions / TWO_POWER_32) * 1000)
 }
 
-
+exports.timestamp=timestamp;
 
 /*
 {"address":"/uhu","types":",i","args":[43] }             
 */
+
+
+function forEachMessage(packet,callback){
+    if(packet.timetag){
+	let time;
+	if(packet.timetag.value){
+            time=timestamp(packet.timetag.value);
+	}else{
+            time=timestamp(packet.timetag);
+	}
+        packet.bundleElements.forEach( (item) => {
+            if(item.timestamp){
+                forEachMessage(item,callback);
+            }else{
+                callback(item,time);
+            }
+        });
+    }else{
+        callback(packet,new Date().getTime());
+    }
+}
+
+
+exports.forEachMessage = forEachMessage;
+
 
 exports.createMessage = function(message){
     let m= new OSC.Message(message.address);

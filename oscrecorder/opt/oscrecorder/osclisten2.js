@@ -29,6 +29,16 @@ function shell(command){
     return execSync(command,[], opts);
 }
 
+function dataView(obj) {
+  if (obj.buffer) {
+    return new DataView(obj.buffer)
+  } else if (obj instanceof ArrayBuffer) {
+    return new DataView(obj)
+  }
+  return new DataView(new Uint8Array(obj))
+}
+
+const Utils = require('./common.js');
 
 // utility functions
 
@@ -36,8 +46,9 @@ function help(){
     console.log(`
 usage: osclisten [options] port1[:/route1] [[ port2[:/route2] ] ... ]
 
-options: --help,-h    : displays this help message
-         --verbose,-v : prints diagnostics
+options: --help,-h     : displays this help message
+         --verbose,-v  : prints diagnostics
+         --delay,-d    : do delay bundles
 
          Listen for osc messages on all given ports, adds the proper /route to the 
          address of the message and writes the message to stdout.
@@ -48,10 +59,11 @@ options: --help,-h    : displays this help message
 }
 
 let table=[];
-let verbose=false;
 
+let verbose=false;
 let port;
 let route;
+let delay=false;
 
 const Args = process.argv.slice(2);
 for(i=0;i<Args.length;i++){
@@ -65,6 +77,10 @@ for(i=0;i<Args.length;i++){
       case '-v':
       case '--verbose':
 	verbose=true;
+	break;
+      case '-d':
+      case '--dispatch':
+	dispatch=true;
 	break;
     default:
 	//console.log(arg.indexOf(':'));
@@ -105,25 +121,49 @@ if(verbose)console.log(JSON.stringify(table,null,2));
 ]
 
 */
-    
-table.forEach( (item) => {
-    item.osc = new OSC({ plugin: new OSC.DatagramPlugin() });
-    item.osc.on('open', () => {
-	item.osc.on('*', (message) => {
-	    // make bundle
-	    let bundle = new OSC.Bundle();
-	    bundle.add(message);
-	    // add route
-	    bundle.bundleElements[0].address = item.route + bundle.bundleElements[0].address;
-	    // beautify
-	    delete bundle.bundleElements[0].offset;
-	    delete bundle.offset;
-	    bundle.timetag=bundle.timetag.value;
-	    // write
-	    process.stdout.write(JSON.stringify(bundle)+'\n');
-	})
-    })
-    item.osc.open( { host: '0.0.0.0', port: item.port });
-});
 
-  
+function out(route, message,timestamp){
+    // make bundle
+    let bundle = new OSC.Bundle(timestamp);
+    bundle.add(message);
+    // add route
+    bundle.bundleElements[0].address = route + bundle.bundleElements[0].address;
+    // beautify
+    delete bundle.bundleElements[0].offset;
+    delete bundle.offset;
+    bundle.timetag=bundle.timetag.value;
+    // write
+    process.stdout.write(JSON.stringify(bundle)+'\n');
+}
+
+if(false){
+   table.forEach( (item) => {
+       item.osc = new OSC({ plugin: new OSC.DatagramPlugin() });
+       item.osc.on('open', () => {
+	   item.osc.on('*', (message) => {
+	       out(item.route, message,new Date().getTime());
+	   })
+       })
+       item.osc.open( { host: '0.0.0.0', port: item.port });
+   });
+}else{
+   table.forEach( (item) => {
+       item.socket=dgram.createSocket('udp4');
+       item.socket.on('message', data => {
+	   var bundle = new OSC.Bundle();
+
+	   if(data.toString().startsWith('#bundle')){
+	       bundle.unpack(dataView(data));
+	   }else{
+	       const msg= new OSC.Message();
+	       msg.unpack(dataView(data));
+	       bundle.add(msg);
+	       //console.log(JSON.stringify(bundle));
+	   }
+	   Utils.forEachMessage(bundle, (message, timestamp) => {
+	       out(item.route, message, timestamp)
+	   });
+       })
+       item.socket.bind(item.port);
+   });
+}
