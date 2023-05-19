@@ -10,9 +10,9 @@ usage:   oscplay [options] filename
        
 options: --help,-h                   : show this message
          --speed,-s <speed>          : set replay speed to <speed> (default: 1.0)
-         --timeOffset,t <timeOffset> : set timeOffset to <timeOffset> ms.
-                                       default is measured file readtime
- 
+         --timeOffset,t <timeOffset> : set timeOffset to <timeOffset> ms. default is measured file readtime
+         --loop,-l                   : loop forever 
+
          Read osc-bundles from <filename> and dump them, using the relative time 
          information, to stdout as osc messages.`);
 }
@@ -71,19 +71,16 @@ let line;
 {"offset":0,"timetag":{"value":{"seconds":3892649641,"fractions":38654976},"offset":0},"bundleElements":[{"offset":36,"address":"/uhu","types":",i","args":[43]}]}
 */
 
-function getTime(bundle){
-    const SECONDS_70_YEARS = 2208988800;
-    const TWO_POWER_32 = 4294967296;
-    
-    if(bundle.timetag.value)bundle.timetag=bundle.timetag.value;
-
-    let timetag=bundle.timetag;
-    let seconds = timetag.seconds - SECONDS_70_YEARS;
-    return (seconds + Math.round(timetag.fractions / TWO_POWER_32)) * 1000;
-}
 
 function  out(item){
+    let timetag;
     if(loop)setTimeout( out, Math.round(speed*duration), item);
+    if(item.bundle.timetag.value){
+	timetag=item.bundle.timetag.value;
+    }else{
+	timetag=item.bundle.timetag;
+    }
+    Utils.timestamp(timetag,new Date().getTime());
     process.stdout.write(JSON.stringify(item.bundle)+'\n')
 }
 
@@ -97,24 +94,24 @@ let start=new Date().getTime();
 
 while(line = liner.next()){
     bundle=JSON.parse(line.toString('ascii'));
-    let time=getTime(bundle);
-    if(bundle.offset)delete bundle.offset;
-    if(bundle.bundleElements) delete bundle.bundleElements[0].offset;
-    if(time<minTime)minTime=time;
-    if(time>maxTime)maxTime=time;
-    bundles.push( { time: time, bundle: bundle } );
+    let timetag;
+    if(bundle.timetag.value){
+	timetag=bundle.timetag.value;
+    }else{
+	timetag=bundle.timetag;
+    }
+    let timestamp=Utils.timestamp(timetag);
+    if(timestamp<minTime)minTime=timestamp;
+    if(timestamp>maxTime)maxTime=timestamp;
+    bundles.push( { time: timestamp, bundle: bundle } );
 }
 duration=maxTime-minTime;
-
-bundles.forEach( (item) => {
-    item.elapsed=item.time-minTime;
-});
-
 
 
 if(!timeOffset)timeOffset=new Date().getTime()-start;
 
 bundles.forEach( (item) => {
+    item.elapsed=item.time-minTime;
     let sceduled=Math.round(speed*item.elapsed)+timeOffset;
     setTimeout( out, sceduled, item );
 });

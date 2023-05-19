@@ -8,35 +8,6 @@ exports.exists = function(name){
     return fs.existsSync(name);
 }
 
-exports.getTime = function(bundle){
-    const SECONDS_70_YEARS = 2208988800;
-    const TWO_POWER_32 = 4294967296;
-
-    let timetag;
-    if(bundle.timetag.value){
-	timetag=bundle.timetag.value;
-    }else{
-	timetag=bundle.timetag;
-    }
-
-    let seconds = timetag.seconds - SECONDS_70_YEARS;
-    return (seconds + Math.round(timetag.fractions / TWO_POWER_32)) * 1000;
-}
-
-exports.getTime2 = function(bundle){
-    
-    let timetag;
-    if(bundle.timetag.value){
-	timetag=bundle.timetag.value;
-    }else{
-	timetag=bundle.timetag;
-    }
-
-    let t = new OSC.Timetag(timetag);
-    return t.timestamp();
-}
-
-
 
 function timestamp(timetag,milliseconds) {
 
@@ -136,3 +107,33 @@ exports.serializeBundle = function(bundle){
     
 */
 
+/*
+exports.getTime = function(bundle){
+    const SECONDS_70_YEARS = 2208988800;
+    const TWO_POWER_32 = 4294967296;
+
+    let timetag;
+    if(bundle.timetag.value){
+	timetag=bundle.timetag.value;
+    }else{
+	timetag=bundle.timetag;
+    }
+
+    let seconds = timetag.seconds - SECONDS_70_YEARS;
+    return (seconds + Math.round(timetag.fractions / TWO_POWER_32)) * 1000;
+}
+
+exports.getTime2 = function(bundle){
+    
+    let timetag;
+    if(bundle.timetag.value){
+	timetag=bundle.timetag.value;
+    }else{
+	timetag=bundle.timetag;
+    }
+
+    let t = new OSC.Timetag(timetag);
+    return t.timestamp();
+}
+
+*/
