@@ -8,23 +8,25 @@ function help(){
     console.log(`
 usage:   oscplay [options] filename
        
-options: --help,-h                : show this message
-         --speed,-s <speed>       : set replay speed to <speed> (default: 1.0)
-
+options: --help,-h                   : show this message
+         --speed,-s <speed>          : set replay speed to <speed> (default: 1.0)
+         --timeOffset,t <timeOffset> : set timeOffset to <timeOffset> ms.
+                                       default is measured file readtime
+ 
          Read osc-bundles from <filename> and dump them, using the relative time 
          information, to stdout as osc messages.`);
 }
 
 let file='';
 let speed=1.0;
-let maxSkip;
+let timeOffset;
 
 const Args = process.argv.slice(2);
 for(let i=0;i<Args.length;i++){
     switch(Args[i]){
-     case '--maxskip':
-     case '-m':	
-	maxskip=Math.round(1000*Args[++i]);
+     case '--timeoffset':
+     case '-t':	
+	timeOffset=Math.round(Args[++i]);
 	break;
      case '--speed':
      case '-s':
@@ -75,7 +77,6 @@ function getTime(bundle){
     return (seconds + Math.round(timetag.fractions / TWO_POWER_32)) * 1000;
 }
 
-let timeOffset;
 let minTime=99999999999999999999;
 let bundles=[];
 
@@ -88,7 +89,7 @@ while(line = liner.next()){
     bundles.push( { time: time, bundle: bundle } );
 }
 
-timeOffset=new Date().getTime()-start;
+if(!timeOffset)timeOffset=new Date().getTime()-start;
 
 bundles.forEach( (item) => {
     let elapsed=Math.round(speed*(item.time-minTime))+timeOffset;
