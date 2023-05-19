@@ -20,6 +20,7 @@ options: --help,-h                   : show this message
 let file='';
 let speed=1.0;
 let timeOffset;
+let loop=false;
 
 const Args = process.argv.slice(2);
 for(let i=0;i<Args.length;i++){
@@ -36,6 +37,10 @@ for(let i=0;i<Args.length;i++){
      case '--help':
 	 help();
 	 process.exit();
+	 break;
+     case '-l':
+     case '--loop':
+	loop=true;
 	 break;
      default:
  	 if(!file){
@@ -77,7 +82,15 @@ function getTime(bundle){
     return (seconds + Math.round(timetag.fractions / TWO_POWER_32)) * 1000;
 }
 
+function  out(item){
+    if(loop)setTimeout( out, Math.round(speed*duration), item);
+    process.stdout.write(JSON.stringify(item.bundle)+'\n')
+}
+
 let minTime=99999999999999999999;
+let maxTime=0;
+let duration;
+
 let bundles=[];
 
 let start=new Date().getTime();
@@ -85,14 +98,24 @@ let start=new Date().getTime();
 while(line = liner.next()){
     bundle=JSON.parse(line.toString('ascii'));
     let time=getTime(bundle);
+    if(bundle.offset)delete bundle.offset;
+    if(bundle.bundleElements) delete bundle.bundleElements[0].offset;
     if(time<minTime)minTime=time;
+    if(time>maxTime)maxTime=time;
     bundles.push( { time: time, bundle: bundle } );
 }
+duration=maxTime-minTime;
+
+bundles.forEach( (item) => {
+    item.elapsed=item.time-minTime;
+});
+
+
 
 if(!timeOffset)timeOffset=new Date().getTime()-start;
 
 bundles.forEach( (item) => {
-    let elapsed=Math.round(speed*(item.time-minTime))+timeOffset;
-    setTimeout( (bundle) => { process.stdout.write(JSON.stringify(bundle)+'\n')} ,elapsed,item.bundle);
+    let sceduled=Math.round(speed*item.elapsed)+timeOffset;
+    setTimeout( out, sceduled, item );
 });
-//console.log(new Date().getTime());
+
