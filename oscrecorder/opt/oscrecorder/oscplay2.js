@@ -9,6 +9,7 @@ function help(){
 usage:   oscplay [options] filename
        
 options: --help,-h                   : show this message
+         --info,-i                   : prints info of <filename> and exits 
          --speed,-s <speed>          : set replay speed to <speed> (default: 1.0)
          --loop,-l                   : loop forever 
 
@@ -39,7 +40,7 @@ for(let i=0;i<Args.length;i++){
 	loop=true;
 	 break;
      case '-i':
-     case '--indo':
+     case '--info':
 	info=true;
 	 break;
      default:
@@ -136,4 +137,3 @@ bundles.forEach( (item) => {
     let sceduled=Math.round(speed*item.elapsed)+timeOffset;
     setTimeout( out, sceduled, item );
 });
-
