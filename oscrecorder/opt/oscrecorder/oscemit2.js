@@ -9,12 +9,12 @@ const Utils = require('./common.js');
 
 function help(){
     console.log(`
-usage: orcroute [options] /route1@path1 host1:port1 [[ /route2@path2 host2:port2 ] ... ]
+  usage: oscemit [options] /route[1@path1] host1:port1 [[ /route2[@path2] host2:port2 ] ... ]
 
-options: --help,-h                    : displays this help message
-         --verbose,-v                 : prints diagnostics
-         --timeoffset,-t <timeoffset> : scedules osc-bundles <timeoffset> ms it the future [defalult=100]
-         --messages,-m                : emit osc-messages not osc-bundles
+options: -h, --help,                   : displays this help message
+         -v, --verbose                 : prints diagnostics
+         -t, --timeoffset <timeoffset> : scedules bundles <timeoffset> ms it the future [defalult=100]
+         -m, --messages                : emit osc-messages not osc-bundles
 
          Reads osc messages form stdin and sends the messages matching /route/path, 
          discarding the /route part, to host:port.
@@ -27,7 +27,7 @@ options: --help,-h                    : displays this help message
 }
 
 let table=[];
-const path=process.env.HOME+'/.oscroute.json';
+const path=process.env.HOME+'/.oscemit.json';
 
 let verbose=false;
 let timeOffset=100;

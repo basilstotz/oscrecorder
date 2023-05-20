@@ -17,7 +17,8 @@ options: --help,-h                   : show this message
          information, to stdout.`);
 }
 
-let file='';
+let files=[];
+
 let speed=1.0;
 let timeOffset;
 let loop=false;
@@ -43,29 +44,25 @@ for(let i=0;i<Args.length;i++){
      case '--info':
 	info=true;
 	 break;
-     default:
- 	 if(!file){
-	    file=Args[i];
-	 }else{
-	    help();
-	    process.exit(1);
-	 }
+    default:
+	files.push( Args[i] );
 	 break;
      }
 }
 
 
-if(file.length==0){
+if(files.length==0){
     help();
     process.exit();
 }else{
-    if(!Utils.exists(file)){
-	console.log("error: could not find "+file);
-	process.exit(1);
-    }
+    files.forEach( (file) => {
+	if(!Utils.exists(file)){
+	    console.log("error: could not find "+file);
+	    process.exit(1);
+	}
+    })
 }
 
-const liner = new lineByLine(file);
 let line;
 
 /*
@@ -85,52 +82,70 @@ function laenge(duration){
 
 function showInfo(){
     console.log('---------------------------------------------------------');
-    console.log('|     File: '+file);
+    console.log('|     File: '+files[0]);
     console.log('---------------------------------------------------------');
-    console.log('|    Start: '+new Date(minTime).toString());
-    console.log('|     Ende: '+new Date(maxTime).toString());
-    console.log('|    Länge: '+laenge(duration));
-    console.log('| Messages: '+bundles.length);
+    console.log('|    Start: '+new Date(globalMinTime).toString());
+    console.log('|     Ende: '+new Date(globalMaxTime).toString());
+    console.log('|    Länge: '+laenge(globalMaxTime-globalMinTime));
+    console.log('| Messages: '+all.length);
     console.log('---------------------------------------------------------');
     process.exit();
 }
 
 
 function  out(item){
-    if(loop && item.timeout){
-	item.timeout=false;
-	setInterval( out, Math.round(speed*duration), item);
-    }
-    Utils.bundleTimestamp(item.bundle,new Date().getTime());    
+    if(loop)setTimeout( out, Math.round(speed*duration), item);
+    Utils.bundleTimestamp(bundle,new Date().getTime());    
     process.stdout.write(JSON.stringify(item.bundle)+'\n')
 }
 
-let minTime=99999999999999999999;
-let maxTime=0;
-let duration;
+let all=[];
 
-let bundles=[];
+let globalMinTime=9999999999999999999999999;
+let globalMaxTime=-9999999999999999999999999;
+let lastMaxTime=new Date().getTime();
+
+
 
 let start=new Date().getTime();
 
-while(line = liner.next()){
-    bundle=JSON.parse(line.toString('ascii'));
+files.forEach( (file) => {
+    let liner = new lineByLine(file);
+
+    let minTime=9999999999999999999999999;
+    let maxTime=-9999999999999999999999999;
+    let bundles=[];
+
+    while(line = liner.next()){
+	bundle=JSON.parse(line.toString('ascii'));
+
+	let timestamp=Utils.bundleTimestamp(bundle);
+	
+	if(timestamp<minTime)minTime=timestamp;
+	if(timestamp>maxTime)maxTime=timestamp;
     
-    timestamp=Utils.bundleTimestamp(bundle);    
-    if(timestamp<minTime)minTime=timestamp;
-    if(timestamp>maxTime)maxTime=timestamp;
-    
-    bundles.push( { time: timestamp, bundle: bundle } );
-}
-duration=maxTime-minTime;
+	bundles.push( { time: timestamp, bundle: bundle } );
+    }
+    bundles.forEach( (item) => {
+	item.elapsed=item.timestamp-minTime;
+	let timestamp=lastMaxTime + item.elapsed;
+
+	if(timestamp<globalMinTime)globalMinTime=timestamp;
+	if(timestamp>globalMaxTime)globalMaxTime=timestamp;
+
+	Utils.bundleTimestamp(item.bundle,timestamp);
+	all.push(item);
+    });
+    let duration = maxTime-minTime;
+
+    lastMaxTime+=duration;
+});
+
+duration=globalMaxTime-globalMinTime;
 
 if(info)showInfo();
 
-if(!timeOffset)timeOffset=new Date().getTime()-start;
 
-bundles.forEach( (item) => {
-    item.elapsed=item.time-minTime;
-    item.timeout=true;
-    let sceduled=Math.round(speed*item.elapsed)+timeOffset;
-    setTimeout( out, sceduled, item );
+all.forEach( (item) => {
+    process.stdout.write(Utils.serializePacket(item.bundle)+'\n');
 });
