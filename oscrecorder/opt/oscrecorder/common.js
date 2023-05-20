@@ -127,21 +127,23 @@ function createBundle(bundle){
 exports.createBundle = createBundle;    
 
 
-
-function serializeBundle(bundle){
-    
-    let b=JSON.parse(JSON.stringify(bundle));
-
-    delete b.offset;
-    b.timetag=bundle.timetag.value;
-    b.bundleElements.forEach( (item) => {
+function beautifyBundle(bundle){
+    delete bundle.offset;
+    if(bundle.timetag.value)bundle.timetag=bundle.timetag.value;
+    bundle.bundleElements.forEach( (item) => {
 	if(item.timetag){
-	    //this is prob. not correct!
-	    serializeBundle(item);
+	    //this is prob. correct!
+	    beautifyBundle(item);
 	}else{
 	    delete item.offset;
 	}
     });
+
+}
+
+function serializeBundle(bundle){
+    let b=JSON.parse(JSON.stringify(bundle));
+    beautifyBundle(b);
     return(JSON.stringify(b));
 }
 exports.serializeBundle = serializeBundle;
