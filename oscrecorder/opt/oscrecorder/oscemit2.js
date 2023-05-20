@@ -116,19 +116,21 @@ const rl = readline.createInterface({
   terminal: false
 })
 
-function out(message,timestamp){
+function out(table, message, timestamp){
     table.find( (item) => {
 	if(message.address.indexOf(item.route+item.path)==0){
-	    let bundle;
+
 	    let response = new OSC.Message(message.address.substring(item.route.length));
 	    message.args.forEach((arg)=>{response.add(arg)});
+	    
 	    if(sendMessages){
-		bundle=response;
+		osc.send(response,{ host: item.host, port: item.port });
 	    }else{
-		bundle = new OSC.Bundle(timestamp);
+		let bundle = new OSC.Bundle(timestamp);
 		bundle.add(response);
+		osc.send(bundle,{ host: item.host, port: item.port });
 	    }
-	    osc.send(bundle,{ host: item.host, port: item.port });
+	    
 	    if(verbose){
 		delete bundle.offset;
 		if(bundle.timetag){
@@ -145,7 +147,7 @@ function out(message,timestamp){
 
 rl.on('line', (line) => {
     utils.forEachMessage(JSON.parse(line), (message,timestamp) => {
-	out(message,timestamp+timeOffset);
+	out(table, message, timestamp+timeOffset);
     });
 });
 
