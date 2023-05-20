@@ -107,7 +107,7 @@ function serializeMessage(message){
     delete m.offset;
     return JSON.stringify(m);
 }  
-exports.serializeMessage = serializeMessage;
+//exports.serializeMessage = serializeMessage;
 
 /*
 {"timetag":{"seconds":3892649641,"fractions":38654976 },"bundleElements":[{"address":"/uhu","types":",i","args":[43]}]}             
@@ -127,25 +127,27 @@ function createBundle(bundle){
 exports.createBundle = createBundle;    
 
 
-function beautifyBundle(bundle){
-    delete bundle.offset;
-    if(bundle.timetag.value)bundle.timetag=bundle.timetag.value;
-    bundle.bundleElements.forEach( (item) => {
-	if(item.timetag){
-	    //this is prob. correct!
-	    beautifyBundle(item);
-	}else{
-	    delete item.offset;
-	}
-    });
-
+function beautifyPacket(packet){
+    delete packet.offset;
+    if(packet.timetag){
+	if(packet.timetag.value)packet.timetag=packet.timetag.value;
+	packet.bundleElements.forEach( (item) => {
+	    if(item.timetag){
+		//this is prob. correct!
+		beautifyPacket(item);
+	    }else{
+		delete item.offset;
+	    }
+	})
+    }
 }
 
-function serializeBundle(bundle){
-    let b=JSON.parse(JSON.stringify(bundle));
-    beautifyBundle(b);
-    return(JSON.stringify(b));
+
+function serializePacket(packet){
+    let p=JSON.parse(JSON.stringify(packet));
+    beautifyPacket(p);
+    return(JSON.stringify(p));
 }
-exports.serializeBundle = serializeBundle;
+exports.serializePacket = serializePacket;
 
 

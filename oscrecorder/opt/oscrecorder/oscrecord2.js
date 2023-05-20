@@ -4,13 +4,10 @@
 
 const OSC = require('osc-js');
 const readline = require('readline');
-const fs = require('fs');
+const Utils = require('./common.js');
 
 let name;
 
-function append(name,data){
-    fs.writeFileSync(name,data,{encoding:'utf8', flag:'a'});
-}
 
 function help(){
     console.log(`
@@ -65,7 +62,7 @@ const rl = readline.createInterface({
 rl.on('line', (line) => {
     //let message=JSON.parse(line);
     process.stdout.write(line+'\n');
-    append(name,line+'\n');
+    Utils.append(name,line+'\n');
 });
 
 rl.once('close', () => {

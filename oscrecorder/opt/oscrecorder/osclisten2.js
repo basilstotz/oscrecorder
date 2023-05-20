@@ -4,30 +4,9 @@
 //https://github.com/adzialocha/osc-js
 
 const dgram = require('dgram');
-
-
 const OSC = require('osc-js');
+const Utils = require('./common.js');
 
-
-const fs = require('fs');
-const { execSync } = require('child_process');
-
-const common = require('./common.js');
-
-// utilty functions
-function read(name){
-    return fs.readFileSync(name,{encoding:'utf8', flag:'r'});
-}
-
-function write(name,data){
-    fs.writeFileSync(name,data,{encoding:'utf8', flag:'w'});
-}
-
-function shell(command){
-    //console.log(args);
-    let opts= { encoding: 'utf8' };
-    return execSync(command,[], opts);
-}
 
 function dataView(obj) {
   if (obj.buffer) {
@@ -38,9 +17,7 @@ function dataView(obj) {
   return new DataView(new Uint8Array(obj))
 }
 
-const Utils = require('./common.js');
 
-// utility functions
 
 function help(){
     console.log(`
@@ -101,10 +78,10 @@ for(i=0;i<Args.length;i++){
 
 const path=process.env.HOME+'/.osclisten.json';
 if(table[0]){
-    write(path,JSON.stringify(table,null,2));    
+    Utils.write(path,JSON.stringify(table,null,2));    
 }else{
-    if(fs.existsSync(path)){
-	table=JSON.parse(read(path));
+    if(Utils.exists(path)){
+	table=JSON.parse(Utils.read(path));
     }else{
 	help();
 	process.exit(1);
@@ -128,12 +105,9 @@ function out(route, message,timestamp){
     bundle.add(message);
     // add route
     bundle.bundleElements[0].address = route + bundle.bundleElements[0].address;
-    // beautify
-    delete bundle.bundleElements[0].offset;
-    delete bundle.offset;
-    bundle.timetag=bundle.timetag.value;
     // write
-    process.stdout.write(JSON.stringify(bundle)+'\n');
+    let res=Utils.serializePacket(bundle);
+    process.stdout.write(res+'\n');
 }
 
 if(false){

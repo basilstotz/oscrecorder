@@ -102,12 +102,12 @@ function out(table, message, timestamp){
 	    
 	    if(sendMessages){
 		osc.send(response,{ host: item.host, port: item.port });
-  		if(verbose)console.log(Utils.serializeMessage(response)+" --> "+item.host+":"+item.port);
+  		if(verbose)console.log(Utils.serializePacket(response)+" --> "+item.host+":"+item.port);
 	    }else{
 		let bundle = new OSC.Bundle(timestamp);
 		bundle.add(response);
 		osc.send(bundle,{ host: item.host, port: item.port });
-		if(verbose)console.log(Utils.serializeBundle(bundle)+" --> "+item.host+":"+item.port);
+		if(verbose)console.log(Utils.serializePacket(bundle)+" --> "+item.host+":"+item.port);
 	    }
 	    return true;
 	}
