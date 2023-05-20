@@ -93,6 +93,11 @@ const rl = readline.createInterface({
 })
 const osc = new OSC({ plugin: new OSC.DatagramPlugin() });
 
+function send(packet,options){
+    osc.send(packet,options);
+    if(verbose)console.log(Utils.serializePacket(packet)+" --> "+options.host+":"+options.port);
+}
+
 function out(table, message, timestamp){
     table.find( (item) => {
 	if(message.address.indexOf(item.route+item.path)==0){
@@ -101,13 +106,11 @@ function out(table, message, timestamp){
 	    message.args.forEach((arg)=>{response.add(arg)});
 	    
 	    if(sendMessages){
-		osc.send(response,{ host: item.host, port: item.port });
-  		if(verbose)console.log(Utils.serializePacket(response)+" --> "+item.host+":"+item.port);
+		send(response,{ host: item.host, port: item.port });
 	    }else{
 		let bundle = new OSC.Bundle(timestamp);
 		bundle.add(response);
-		osc.send(bundle,{ host: item.host, port: item.port });
-		if(verbose)console.log(Utils.serializePacket(bundle)+" --> "+item.host+":"+item.port);
+		send(bundle,{ host: item.host, port: item.port });
 	    }
 	    return true;
 	}
