@@ -1,8 +1,6 @@
 const OSC = require('osc-js');
 const fs = require('fs');
 
-//const {Timetag} = require( 'osc-js/src/atomic/timetag.js');
-
 
 exports.exists = function(name){
     return fs.existsSync(name);
@@ -37,6 +35,15 @@ exports.timestamp=timestamp;
 {"address":"/uhu","types":",i","args":[43] }             
 */
 
+function bundleTimestamp(bundle,milliseconds){
+	if(bundle.timetag.value){
+            return timestamp(bundle.timetag.value,milliseconds);
+	}else{
+            return timestamp(bundle.timetag,milliseconds);
+	}
+}    
+
+exports.bundleTimestamp = bundleTimestamp;
 
 function forEachMessage(packet,callback){
     if(packet.timetag){

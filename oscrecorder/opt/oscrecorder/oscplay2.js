@@ -14,7 +14,7 @@ options: --help,-h                   : show this message
          --loop,-l                   : loop forever 
 
          Read osc-bundles from <filename> and dump them, using the relative time 
-         information, to stdout as osc messages.`);
+         information, to stdout.`);
 }
 
 let file='';
@@ -83,15 +83,22 @@ function laenge(duration){
     return h+'h '+m+'m '+s+'.'+r+'s';
 }
 
+function showInfo(){
+    console.log('---------------------------------------------------------');
+    console.log('|     File: '+file);
+    console.log('---------------------------------------------------------');
+    console.log('|    Start: '+new Date(minTime).toString());
+    console.log('|     Ende: '+new Date(maxTime).toString());
+    console.log('|    Länge: '+laenge(duration));
+    console.log('| Messages: '+bundles.length);
+    console.log('---------------------------------------------------------');
+    process.exit();
+}
+
+
 function  out(item){
-    let timetag;
     if(loop)setTimeout( out, Math.round(speed*duration), item);
-    if(item.bundle.timetag.value){
-	timetag=item.bundle.timetag.value;
-    }else{
-	timetag=item.bundle.timetag;
-    }
-    Utils.timestamp(timetag,new Date().getTime());
+    Utils.bundleTimestamp(bundle,new Date().getTime());    
     process.stdout.write(JSON.stringify(item.bundle)+'\n')
 }
 
@@ -105,30 +112,16 @@ let start=new Date().getTime();
 
 while(line = liner.next()){
     bundle=JSON.parse(line.toString('ascii'));
-    let timetag;
-    if(bundle.timetag.value){
-	timetag=bundle.timetag.value;
-    }else{
-	timetag=bundle.timetag;
-    }
-    let timestamp=Utils.timestamp(timetag);
+    
+    timestamp=Utils.bundleTimestamp(bundle);    
     if(timestamp<minTime)minTime=timestamp;
     if(timestamp>maxTime)maxTime=timestamp;
+    
     bundles.push( { time: timestamp, bundle: bundle } );
 }
 duration=maxTime-minTime;
 
-if(info){
-    console.log('---------------------------------------------------------');
-    console.log('|     File: '+file);
-    console.log('---------------------------------------------------------');
-    console.log('|    Start: '+new Date(minTime).toString());
-    console.log('|     Ende: '+new Date(maxTime).toString());
-    console.log('|    Länge: '+laenge(duration));
-    console.log('| Messages: '+bundles.length);
-    console.log('---------------------------------------------------------\n');
-    process.exit();
-}
+if(info)showInfo();
 
 if(!timeOffset)timeOffset=new Date().getTime()-start;
 

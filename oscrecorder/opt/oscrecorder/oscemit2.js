@@ -116,14 +116,6 @@ const rl = readline.createInterface({
   terminal: false
 })
 
-rl.on('line', (line) => {
-    utils.forEachMessage(JSON.parse(line),out);
-});
-
-rl.once('close', () => {
-    process.exit();
- });
-
 function out(message,timestamp){
     table.find( (item) => {
 	if(message.address.indexOf(item.route+item.path)==0){
@@ -151,29 +143,13 @@ function out(message,timestamp){
     });
 }
 
-/*
-function route(packet){
+rl.on('line', (line) => {
+    utils.forEachMessage(JSON.parse(line), (message,timestamp) => {
+	out(message,timestamp+timeOffset);
+    });
+});
 
-    let timestamp;
-    
-    if(packet.timetag){
-	timestamp=Math.round(utils.timestamp(packet.timetag));
-	packet.bundleElements.forEach( (item) => {
-	    if(item.timestamp){
-	        route(item);
-	    }else{
-		out(table,item,timestamp);
-	    }
-	});			       
-    }else{
-	timestamp = Math.round(new Date().getTime());
-	out(table,packet,timestamp);
-    }
-}
+rl.once('close', () => {
+    process.exit();
+ });
 
-function route2(packet){
-    let timestamp=utils.timestamp(packet.timetag)+timeOffset;
-    out(table,packet.bundleElements[0],timestamp);
-}
-
-*/
