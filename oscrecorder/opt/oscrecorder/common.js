@@ -1,10 +1,37 @@
 const OSC = require('osc-js');
 const fs = require('fs');
+const { execSync } = require('child_process');
 
 
-exports.exists = function(name){
+
+function exists(name){
     return fs.existsSync(name);
 }
+exports.exists = exists;
+                                                                                                                                                                                              
+function read(name){
+    return fs.readFileSync(name,{encoding:'utf8', flag:'r'});
+}
+exports.read=read;
+
+function write(name,data){
+    fs.writeFileSync(name,data,{encoding:'utf8', flag:'w'});
+}
+exports.write=write;
+
+
+function append(name,data){
+    fs.writeFileSync(name,data,{encoding:'utf8', flag:'a'});
+}
+exports.append=append;
+
+
+function shell(command){
+    //console.log(args);                                                                                                                                                                                         
+    let opts= { encoding: 'utf8' };
+    return execSync(command,[], opts);
+}
+exports.shell=shell;
 
 
 function timestamp(timetag,milliseconds) {
@@ -28,7 +55,6 @@ function timestamp(timetag,milliseconds) {
     //orig: return (seconds + Math.round(timetag.fractions / TWO_POWER_32)) * 1000
     return Math.round((seconds + timetag.fractions / TWO_POWER_32) * 1000)
 }
-
 exports.timestamp=timestamp;
 
 /*
@@ -42,8 +68,8 @@ function bundleTimestamp(bundle,milliseconds){
             return timestamp(bundle.timetag,milliseconds);
 	}
 }    
-
 exports.bundleTimestamp = bundleTimestamp;
+
 
 function forEachMessage(packet,callback){
     if(packet.timetag){
@@ -64,27 +90,30 @@ function forEachMessage(packet,callback){
         callback(packet,new Date().getTime());
     }
 }
-
-
 exports.forEachMessage = forEachMessage;
 
 
-exports.createMessage = function(message){
+function createMessage(message){
     let m= new OSC.Message(message.address);
     message.args.forEach( (arg) => { m.add(arg) });
     return m;
 }
+exports.createMessage = createMessage;
 
-exports.serializeMessage = function(message){
-    delete message.offset;
-    return JSON.stringyfy(message);
+
+function serializeMessage(message){
+
+    let m=JSON.parse(JSON.stringify(message));
+    delete m.offset;
+    return JSON.stringify(m);
 }  
+exports.serializeMessage = serializeMessage;
 
 /*
 {"timetag":{"seconds":3892649641,"fractions":38654976 },"bundleElements":[{"address":"/uhu","types":",i","args":[43]}]}             
 */
 
-exports.createBundle = function(bundle){
+function createBundle(bundle){
     let b=new OSC.Bundle(getTime(bundle));
     bundle.bundleElements.forEach( (item) => {
 	if(item.timetag){
@@ -95,52 +124,26 @@ exports.createBundle = function(bundle){
     });
     return b;
 };
-    
+exports.createBundle = createBundle;    
 
-/*
-exports.serializeBundle = function(bundle){                                                                                                                    
-    delete bundle.offset;
-    bundle.timetag=bundle.timetag.value;
-    bundle.bundleElements.forEach( (item) => {
+
+
+function serializeBundle(bundle){
+    
+    let b=JSON.parse(JSON.stringify(bundle));
+
+    delete b.offset;
+    b.timetag=bundle.timetag.value;
+    b.bundleElements.forEach( (item) => {
 	if(item.timetag){
+	    //this is prob. not correct!
 	    serializeBundle(item);
 	}else{
-	    serializeMessage(item);
+	    delete item.offset;
 	}
-    }
-		return(JSON.stringify(bundle));
-				   
-				 }
-    
-*/
-
-/*
-exports.getTime = function(bundle){
-    const SECONDS_70_YEARS = 2208988800;
-    const TWO_POWER_32 = 4294967296;
-
-    let timetag;
-    if(bundle.timetag.value){
-	timetag=bundle.timetag.value;
-    }else{
-	timetag=bundle.timetag;
-    }
-
-    let seconds = timetag.seconds - SECONDS_70_YEARS;
-    return (seconds + Math.round(timetag.fractions / TWO_POWER_32)) * 1000;
+    });
+    return(JSON.stringify(b));
 }
+exports.serializeBundle = serializeBundle;
 
-exports.getTime2 = function(bundle){
-    
-    let timetag;
-    if(bundle.timetag.value){
-	timetag=bundle.timetag.value;
-    }else{
-	timetag=bundle.timetag;
-    }
 
-    let t = new OSC.Timetag(timetag);
-    return t.timestamp();
-}
-
-*/

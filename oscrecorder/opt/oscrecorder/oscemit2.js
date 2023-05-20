@@ -2,33 +2,10 @@
 
 
 //https://github.com/adzialocha/osc-js                                                                                                      
+const readline = require('readline');
 const OSC = require('osc-js');
-const osc = new OSC({ plugin: new OSC.DatagramPlugin() });
+const Utils = require('./common.js');
 
-const fs = require('fs');
-const { execSync } = require('child_process');
-
-
-// utilty functions
-function read(name){
-    return fs.readFileSync(name,{encoding:'utf8', flag:'r'});
-}
-
-function write(name,data){
-    fs.writeFileSync(name,data,{encoding:'utf8', flag:'w'});
-}
-
-function shell(command){
-    //console.log(args);
-    let opts= { encoding: 'utf8' };
-    return execSync(command,[], opts);
-}
-// utility functions
-
-
-const utils = require('./common.js');
-
-//console.log(JSON.stringify(common));
 
 function help(){
     console.log(`
@@ -96,10 +73,10 @@ for(i=0;i<Args.length;i++){
 }
 
 if(table[0]){
-    write(path,JSON.stringify(table,null,2));    
+    Utils.write(path,JSON.stringify(table,null,2));    
 }else{
-    if(fs.existsSync(path)){
-	table=JSON.parse(read(path));
+    if(Utils.exists(path)){
+	table=JSON.parse(Utils.read(path));
     }else{
 	help();
 	process.exit(1);
@@ -109,12 +86,12 @@ if(verbose)console.log(JSON.stringify(table,null,2));
 
 
 
-const readline = require('readline');
 const rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout,
   terminal: false
 })
+const osc = new OSC({ plugin: new OSC.DatagramPlugin() });
 
 function out(table, message, timestamp){
     table.find( (item) => {
@@ -125,19 +102,12 @@ function out(table, message, timestamp){
 	    
 	    if(sendMessages){
 		osc.send(response,{ host: item.host, port: item.port });
+  		if(verbose)console.log(Utils.serializeMessage(response)+" --> "+item.host+":"+item.port);
 	    }else{
 		let bundle = new OSC.Bundle(timestamp);
 		bundle.add(response);
 		osc.send(bundle,{ host: item.host, port: item.port });
-	    }
-	    
-	    if(verbose){
-		delete bundle.offset;
-		if(bundle.timetag){
-		    delete bundle.bundleElements[0].offset;
-	            bundle.timetag=bundle.timetag.value;
-		}
-		console.log(JSON.stringify(bundle)+" --> "+item.host+":"+item.port);
+		if(verbose)console.log(Utils.serializeBundle(bundle)+" --> "+item.host+":"+item.port);
 	    }
 	    return true;
 	}
@@ -146,7 +116,7 @@ function out(table, message, timestamp){
 }
 
 rl.on('line', (line) => {
-    utils.forEachMessage(JSON.parse(line), (message,timestamp) => {
+    Utils.forEachMessage(JSON.parse(line), (message,timestamp) => {
 	out(table, message, timestamp+timeOffset);
     });
 });
