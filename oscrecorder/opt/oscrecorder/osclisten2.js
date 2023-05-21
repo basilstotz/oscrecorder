@@ -25,7 +25,7 @@ usage: osclisten [options] port1[:/route1] [[ port2[:/route2] ] ... ]
 
 options: --help,-h     : displays this help message
          --verbose,-v  : prints diagnostics
-         --delay,-d    : do delay bundles
+         --nodelay,-n    : do not delay bundles, pass them tru
 
          Listen for osc messages on all given ports, adds the proper /route to the 
          address of the message and writes the message to stdout.
@@ -40,7 +40,7 @@ let table=[];
 let verbose=false;
 let port;
 let route;
-let delay=false;
+let delay=true;
 
 const Args = process.argv.slice(2);
 for(i=0;i<Args.length;i++){
@@ -55,9 +55,9 @@ for(i=0;i<Args.length;i++){
       case '--verbose':
 	verbose=true;
 	break;
-      case '-d':
-      case '--dispatch':
-	dispatch=true;
+      case '-n':
+      case '--nodelay':
+	delay=false;
 	break;
     default:
 	//console.log(arg.indexOf(':'));
@@ -110,7 +110,7 @@ function out(route, message,timestamp){
     process.stdout.write(res+'\n');
 }
 
-if(false){
+if(delay){
    table.forEach( (item) => {
        item.osc = new OSC({ plugin: new OSC.DatagramPlugin() });
        item.osc.on('open', () => {

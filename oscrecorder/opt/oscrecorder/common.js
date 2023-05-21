@@ -33,6 +33,7 @@ function shell(command){
 }
 exports.shell=shell;
 
+// functions for forEachMessage
 
 function timestamp(timetag,milliseconds) {
 
@@ -57,9 +58,6 @@ function timestamp(timetag,milliseconds) {
 }
 exports.timestamp=timestamp;
 
-/*
-{"address":"/uhu","types":",i","args":[43] }             
-*/
 
 function bundleTimestamp(bundle,milliseconds){
 	if(bundle.timetag.value){
@@ -70,20 +68,18 @@ function bundleTimestamp(bundle,milliseconds){
 }    
 exports.bundleTimestamp = bundleTimestamp;
 
+// the function forEachMessage(packet,callback) calls callback(message,timestamp) for
+// each message found in packet. packet can be a message or an arbitray nested bundle. 
+// when packet is a message the actual time will be used as timestamp.
 
 function forEachMessage(packet,callback){
     if(packet.timetag){
-	let time;
-	if(packet.timetag.value){
-            time=timestamp(packet.timetag.value);
-	}else{
-            time=timestamp(packet.timetag);
-	}
+	let timestamp = bundleTimestamp(packet);
         packet.bundleElements.forEach( (item) => {
             if(item.timestamp){
                 forEachMessage(item,callback);
             }else{
-                callback(item,time);
+                callback(item,timestamp);
             }
         });
     }else{
@@ -100,21 +96,8 @@ function createMessage(message){
 }
 exports.createMessage = createMessage;
 
-
-function serializeMessage(message){
-
-    let m=JSON.parse(JSON.stringify(message));
-    delete m.offset;
-    return JSON.stringify(m);
-}  
-//exports.serializeMessage = serializeMessage;
-
-/*
-{"timetag":{"seconds":3892649641,"fractions":38654976 },"bundleElements":[{"address":"/uhu","types":",i","args":[43]}]}             
-*/
-
 function createBundle(bundle){
-    let b=new OSC.Bundle(getTime(bundle));
+    let b=new OSC.Bundle(bundleTimestamp(bundle));
     bundle.bundleElements.forEach( (item) => {
 	if(item.timetag){
 	    b.add(createBundle(item));
@@ -125,6 +108,21 @@ function createBundle(bundle){
     return b;
 };
 exports.createBundle = createBundle;    
+
+
+/*
+function serializeMessage(message){
+
+    let m=JSON.parse(JSON.stringify(message));
+    delete m.offset;
+    return JSON.stringify(m);
+}  
+//exports.serializeMessage = serializeMessage;
+*/
+
+/*
+{"timetag":{"seconds":3892649641,"fractions":38654976 },"bundleElements":[{"address":"/uhu","types":",i","args":[43]}]}             
+*/
 
 
 function beautifyPacket(packet){
@@ -141,7 +139,6 @@ function beautifyPacket(packet){
 	})
     }
 }
-
 
 function serializePacket(packet){
     let p=JSON.parse(JSON.stringify(packet));
