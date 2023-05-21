@@ -53,25 +53,26 @@ options: --help,-h                    : displays this help message
 
 ### osclisten
 ```
-usage: osclisten [options] port1[:/route1] [[ port2[:/route2] ] ... ]
+  usage: osclisten [options] port1[:/route1] [[ port2[:/route2] ] ... ]
 
 options: -h, --help     : displays this help message
          -v, --verbose  : prints diagnostics
          -n, --nodelay  : do not delay bundles, pass them tru
 
          Listen for messages or arbitraly nested bundles on all given ports
-         and writes all found messages as bundles to stdout.
+         and writes all found messages as bundles to stdout. When a message
+	 is received, the current time will be used as timetag.
 
-         When a </route> is given, </route/> is prependend to each message.
+         When a </route> is given, </route/> is prependend to each message
+	 incomming from this port.
 
-         When a message is received, the current time will be used as timetag.
-	 
          As default bundles are delayed, when the timetag lyes in the future,
          but when the option --nodelay is given the output is instantly.
 
-         The options are always saved in ~/.osclisten.json and are applied, when
-         oscaddroute is called without arguments. It is possible to directly
-         edit ~/.osclisten.json .```
+         The arguments are always saved in ~/.osclisten.json and are applied, when
+         osclisten is called without arguments. It is possible to directly
+         edit ~/.osclisten.json .
+```
 
 ## Examples
 ### Basic Usage
