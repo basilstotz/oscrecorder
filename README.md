@@ -13,22 +13,21 @@ and port number.
 ### oscrecord
 ```
   usage: oscrecord [options] filename
+   
+options: -h, --help : show this message
 
-options: --help,-h : show this message
-
-         Reads osc messages on stdin and writes them unaltered to stdout
+         Reads lines from stdin and writes them unaltered to stdout
          and to <filename>.
-	 
-         This file can be replayed with the same timing with oscplay.
 ```
 
 ### oscplay
 ```
   usage: oscplay [options] filename
        
-options: --help,-h                : show this message
-         --speed,-s <speed>       : replay speed (default: 1.0)
-
+options: -h, --help                : show this message
+         -s, --speed <speed>       : replay speed (default: 1.0)
+         -l, --loop                : loops forever
+	 
          Read osc messages from <filename> and write them, using the same timing
 	 when recorded, to stdout.
 ```
@@ -37,18 +36,18 @@ options: --help,-h                : show this message
 ```
   usage: oscemit [options] /route1[@path1] host1:port1 [[ /route2[@path2] host2:port2 ] ... ]
 
-options: --help,-h                    : displays this help message
-         --verbose,-v                 : prints diagnostics
-	 --timeoffset,-t <timeoffset> : scedules messages <timeoffset> ms it the future [defalult=100]  
-
-         Reads osc messages form stdin and sends the messages matching /route/path, 
-         discarding the /route part, to host:port.
+options: -h, --help                    : displays this help message
+         -v, --verbose                 : prints diagnostics
+	 -t, --timeoffset <timeoffset> : scedules messages <timeoffset> ms it the future [defalult=100]  
+         -m, --messages                : do not send bundles, do sen messages.
+	 
+         Reads messages or arbirarly nested bundles from stdin and sends all found messages 
+	 matching /route/path, discarding the /route part, as bundles to host:port.
+	 
+	 Use a  "/ hostN:portN" (as the last argument) for a catch all route.
        
-         The options are always saved in ~/.oscroute.json and are applied, when oscroute
-         is called without arguments. It is possible to directly edit ~/.oscroute.json .
-
-         The /route part or the @path part can be empty. Use a single / for a catch all 
-         route.
+         The options are always saved in ~/.oscemit.json and are applied, when oscroute
+         is called without arguments. It is possible to directly edit ~/.oscemit.json .
 ```
 
 ### osclisten
@@ -63,8 +62,8 @@ options: -h, --help     : displays this help message
          and writes all found messages as bundles to stdout. When a message
 	 is received, the current time will be used as timetag.
 
-         When a </route> is given, </route/> is prependend to each message
-	 incomming from this port.
+         When a </route> is given, </route/> is prependend to the address on every 
+	 message incomming at this port.
 
          As default bundles are delayed, when the timetag lyes in the future,
          but when the option --nodelay is given the output is instantly.
