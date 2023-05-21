@@ -53,20 +53,25 @@ options: --help,-h                    : displays this help message
 
 ### osclisten
 ```
-  usage: osclisten [options] port1[:/route1] [[ poert2[/route2] ] ... ]
+usage: osclisten [options] port1[:/route1] [[ port2[:/route2] ] ... ]
 
-options: --help,-h    : displays this help message
-         --verbose,-v : prints diagnostics
+options: -h, --help     : displays this help message
+         -v, --verbose  : prints diagnostics
+         -n, --nodelay  : do not delay bundles, pass them tru
 
-         Listen for osc messages on all given ports, adds the proper /route to the 
-         address of the message and writes the message to stdout.
-       
-         The options are always saved in ~/.oscaddroute.json and are applied, when 
-         oscaddroute is called without arguments. It is possible to directly 
-         edit ~/.oscaddroute.json .
+         Listen for messages or arbitraly nested bundles on all given ports
+         and writes all found messages as bundles to stdout.
 
-         The /route can be empty: Use port , when no route sould be added.
-```
+         When a </route> is given, </route/> is prependend to each message.
+
+         When a message is received, the current time will be used as timetag.
+	 
+         As default bundles are delayed, when the timetag lyes in the future,
+         but when the option --nodelay is given the output is instantly.
+
+         The options are always saved in ~/.osclisten.json and are applied, when
+         oscaddroute is called without arguments. It is possible to directly
+         edit ~/.osclisten.json .```
 
 ## Examples
 ### Basic Usage
@@ -75,10 +80,11 @@ Listen on port 8008 for OSC messages and write then to stdout:
 
 ```osclisten 8008 ```
 
-Listen on port 8008 for OSC messages and record the message on file ```record.osc```:
+The output can bu used for inspection or it can be piped to ```oscrecord```. 
 
 ```osclisten 8008 | oscreord record.osc```
 
+This will listen on port 8008 for OSC messages and record the message on file ```record.osc```.
 The messages are also written to stdout. This can be used for inspection or it can be piped to
 ```oscemit```:
 
@@ -92,7 +98,13 @@ on port ```9000``` use:
 
 ```oscplay record.osc | oscemit / 192.168.1.123:900```
 
-### Advanced Usage
+### Install
 
-Listen on port ```8008```, add the route ```/ardour``` and listen on port ```800```, add the route ```/jadeo``` to the messages:
-``` ```
+#### Linux
+
+
+
+#### MacOs
+
+
+#### Android

@@ -27,9 +27,16 @@ options: --help,-h     : displays this help message
          --verbose,-v  : prints diagnostics
          --nodelay,-n    : do not delay bundles, pass them tru
 
-         Listen for osc messages on all given ports, adds the proper /route to the 
-         address of the message and writes the message to stdout.
-       
+         Listen for messages or arbitraly nested bundles on all given ports 
+         and writes all found messages as bundles to stdout.
+
+         When a </route> is given, </route/> is prependend to each message.
+ 
+         When a message is received, the current time will be used as timetag.
+
+         As default bundles are delayed, when the timetag lyes in the future,
+         but when the option --nodelay is given the output is instantly.
+
          The options are always saved in ~/.osclisten.json and are applied, when 
          oscaddroute is called without arguments. It is possible to directly 
          edit ~/.osclisten.json .`);
